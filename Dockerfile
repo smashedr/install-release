@@ -1,4 +1,4 @@
 FROM scratch
 ARG TARGETPLATFORM
-ENTRYPOINT ["/usr/bin/install-release"]
-COPY $TARGETPLATFORM/install-release /usr/bin/
+ENTRYPOINT ["/usr/bin/ir"]
+COPY $TARGETPLATFORM/ir /usr/bin/
