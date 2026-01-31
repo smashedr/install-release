@@ -11,7 +11,7 @@ var listCmd = &cobra.Command{
 	Use:     "list [name]",
 	Aliases: []string{"l", "li", "lis", "ls"},
 	Short:   "List installed binaries",
-	Long:    "List installed binaries",
+	Long:    "List installed binaries.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("--------------------\n")
 		fmt.Printf("args: %s\n", args)

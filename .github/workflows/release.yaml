@@ -9,14 +9,14 @@ env:
   tap-owner: smashedr
   tap-repo: homebrew-test
 
-permissions:
-  contents: write
-
 jobs:
   build:
     name: "Build"
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    permissions:
+      contents: write
 
     steps:
       - name: "Checkout"
@@ -92,6 +92,9 @@ jobs:
     env:
       output: "out"
 
+    permissions:
+      contents: write
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v6
@@ -143,6 +146,9 @@ jobs:
     timeout-minutes: 15
     needs: [windows]
 
+    permissions:
+      contents: write
+
     steps:
       - name: "Download Artifact"
         if: ${{ !github.event.release.prerelease }}
@@ -189,6 +195,9 @@ jobs:
     runs-on: Ubuntu-latest
     timeout-minutes: 5
     needs: [release]
+
+    permissions:
+      contents: write
 
     steps:
       - name: "Alls Green"

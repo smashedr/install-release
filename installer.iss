@@ -44,7 +44,8 @@ ChangesEnvironment=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "dist\PathMgr\i386\PathMgr.dll"; DestDir: "{app}"; Flags: uninsneveruninstall
+Source: "dist\PathMgr\i386\PathMgr.dll"; DestDir: "{app}"; Flags: uninsneveruninstall; Check: not Is64BitInstallMode()
+Source: "dist\PathMgr\x86_64\PathMgr.dll"; DestDir: "{app}"; Flags: uninsneveruninstall; Check: Is64BitInstallMode()
 Source: "dist\client\install-release_windows_386_sse2\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode()
 Source: "dist\client\install-release_windows_amd64_v1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode() and not IsArm64()
 Source: "dist\client\install-release_windows_arm64_v8.0\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: IsArm64()
