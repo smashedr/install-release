@@ -1,10 +1,11 @@
 #define MyAppName "InstallRelease"
 #define MyAppPublisher "CSSNR"
 #define MyAppURL "https://smashedr.github.io/install-release/"
-#define MyAppExeName "install-release.exe"
+#define MyAppExeName "ir.exe"
 #ifndef MyAppVersion
   #define MyAppVersion "0.0.1"
 #endif
+#define MyAppFileName "ir"
 
 [Setup]
 AppId={{5A1C755C-43D6-4445-BFC9-ABF23CEEF33E}
@@ -25,7 +26,7 @@ DisableFinishedPage=yes
 InfoBeforeFile=assets\pre-install.rtf
 InfoAfterFile=assets\post-install.rtf
 
-OutputBaseFilename=windows_installer
+OutputBaseFilename={#MyAppFileName}_windows_installer
 OutputDir=out
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
@@ -46,9 +47,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: "dist\PathMgr\i386\PathMgr.dll"; DestDir: "{app}"; Flags: uninsneveruninstall; Check: not Is64BitInstallMode()
 Source: "dist\PathMgr\x86_64\PathMgr.dll"; DestDir: "{app}"; Flags: uninsneveruninstall; Check: Is64BitInstallMode()
-Source: "dist\client\install-release_windows_386_sse2\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode()
-Source: "dist\client\install-release_windows_amd64_v1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode() and not IsArm64()
-Source: "dist\client\install-release_windows_arm64_v8.0\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: IsArm64()
+Source: "dist\client\{#MyAppFileName}_windows_386_sse2\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode()
+Source: "dist\client\{#MyAppFileName}_windows_amd64_v1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode() and not IsArm64()
+Source: "dist\client\{#MyAppFileName}_windows_arm64_v8.0\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: IsArm64()
 
 [Icons]
 Name: "{group}\{#MyAppName} Folder"; Filename: "{app}"
