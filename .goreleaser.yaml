@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 2
+
+# https://goreleaser.com/customization/project/
+project_name: install-release
+dist: dist/client
+
+before:
+  hooks:
+    - go mod tidy
+
+# https://goreleaser.com/customization/builds/go/
+builds:
+  - env:
+      - CGO_ENABLED=0
+
+archives:
+  - formats: [tar.gz]
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+dockers_v2:
+  - images:
+      - "ghcr.io/smashedr/{{ .ProjectName }}"
+    tags:
+      - "{{ if .Prerelease }}prerelease{{ else }}latest{{ end }}"
+      - "{{ .Version }}"
+    labels:
+      "org.opencontainers.image.description": "CLI to Install a GitHub Release"
+      "org.opencontainers.image.created": "{{ .Date }}"
+      "org.opencontainers.image.name": "{{ .ProjectName }}"
+      "org.opencontainers.image.title": "{{ .ProjectName }}"
+      "org.opencontainers.image.revision": "{{ .FullCommit }}"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.source": "{{ .GitURL }}"
+    disable: "{{ or .IsSnapshot .Prerelease }}"
+
+brews:
+  - repository:
+      owner: smashedr
+      name: homebrew-test
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/smashedr/{{ .ProjectName }}"
+    description: "CLI to Install a GitHub Release"
+    license: "MIT"
+    test: |
+      assert_match version.to_s, shell_output("#{bin}/install-release -V")
+    caveats: |
+      View the Documentation:
+      https://smashedr.github.io/install-release/
+
+    skip_upload: true
+
+#changelog:
+#  sort: asc
+#  filters:
+#    exclude:
+#      - "^docs:"
+#      - "^test:"
+
+release:
+  replace_existing_artifacts: true
