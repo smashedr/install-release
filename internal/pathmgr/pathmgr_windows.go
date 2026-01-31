@@ -1,6 +1,6 @@
 //go:build windows
 
-package internal
+package pathmgr
 
 import (
 	"fmt"

@@ -116,7 +116,7 @@ jobs:
 
       - name: "Debug Artifacts"
         run: |
-          ls dist
+          ls -Recurse dist
 
       - name: "Inno Setup"
         run: |
@@ -125,7 +125,7 @@ jobs:
 
       - name: "Debug Output"
         run: |
-          ls "${{ env.output }}"
+          ls -Recurse "${{ env.output }}"
 
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v6

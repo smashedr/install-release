@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/smashedr/install-release/internal"
+	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"strings"
@@ -45,7 +45,7 @@ var pathCmd = &cobra.Command{
 
 		switch command {
 		case "a", "ad", "add":
-			added, ret, err := internal.AddDirToPath(path, 1, 0)
+			added, ret, err := pathmgr.AddDirToPath(path, 1, 0)
 			fmt.Printf("--------------------\n")
 			fmt.Printf("added: %v\n", added)
 			fmt.Printf("ret: %v\n", ret)
@@ -53,7 +53,7 @@ var pathCmd = &cobra.Command{
 		case "r", "re", "rem", "remove":
 			fmt.Printf("INOP!\n")
 		case "c", "ch", "chk", "check":
-			found, findType, err := internal.IsDirInPath(path)
+			found, findType, err := pathmgr.IsDirInPath(path)
 			fmt.Printf("--------------------\n")
 			fmt.Printf("found: %v\n", found)
 			fmt.Printf("findType: %v\n", findType)
