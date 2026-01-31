@@ -33,8 +33,9 @@ CLI to Install a GitHub Release.
 
 Easily Install GitHub Release binaries with Windows support.
 
-> [!WARNING]  
-> Coming Soon... README.md not up-to-date!
+> [!IMPORTANT]  
+> This project is in development.
+> It is functional but may have bugs.
 
 [![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
 
