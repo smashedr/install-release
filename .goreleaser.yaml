@@ -4,7 +4,7 @@
 version: 2
 
 # https://goreleaser.com/customization/project/
-project_name: install-release
+project_name: ir
 dist: dist/client
 
 before:

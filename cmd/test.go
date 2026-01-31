@@ -10,7 +10,7 @@ var testCmd = &cobra.Command{
 	Use:     "test",
 	Aliases: []string{"t", "te", "tes"},
 	Short:   "Test command",
-	Long:    "Test command",
+	Long:    "Test command.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("--------------------\n")
 		fmt.Printf("args: %s\n", args)

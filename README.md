@@ -33,8 +33,9 @@ CLI to Install a GitHub Release.
 
 Easily Install GitHub Release binaries with Windows support.
 
-> [!WARNING]  
-> Coming Soon... README.md not up-to-date!
+> [!IMPORTANT]  
+> This project is in development.
+> It is functional but may have bugs.
 
 [![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
 
@@ -52,7 +53,7 @@ brew install smashedr/test/install-release
 curl https://i.jpillora.com/smashedr/install-release! | bash
 ```
 
-Windows users can download the [windows_installer.exe](https://github.com/smashedr/install-release/releases/latest/download/windows_installer.exe).  
+Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_windows_installer.exe).  
 Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
 
 #### Docker

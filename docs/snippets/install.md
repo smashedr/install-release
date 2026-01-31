@@ -10,7 +10,7 @@
     curl https://i.jpillora.com/smashedr/install-release! | bash  # (1)!
     ```
 
-    1.  Windows users can download the [windows_installer.exe](https://github.com/smashedr/install-release/releases/latest/download/windows_installer.exe).
+    1.  Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_windows_installer.exe).
 
         Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
 
