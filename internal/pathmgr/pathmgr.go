@@ -2,6 +2,12 @@
 
 package pathmgr
 
+import (
+	"os"
+	"path/filepath"
+	"strings"
+)
+
 func IsDirInPath(dirPath string) (found bool, pathType uint32, err error) {
 	pathEnv := os.Getenv("PATH")
 	paths := strings.Split(pathEnv, ":")
