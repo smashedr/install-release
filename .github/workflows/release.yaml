@@ -5,7 +5,7 @@ on:
     types: [published]
 
 env:
-  formula: install-release.rb
+  formula: ir.rb
   tap-owner: smashedr
   tap-repo: homebrew-test
 
