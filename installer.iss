@@ -45,17 +45,15 @@ ChangesEnvironment=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "dist\PathMgr\i386\PathMgr.dll"; DestDir: "{app}"; Flags: uninsneveruninstall; Check: not Is64BitInstallMode()
-Source: "dist\PathMgr\x86_64\PathMgr.dll"; DestDir: "{app}"; Flags: uninsneveruninstall; Check: Is64BitInstallMode()
+Source: "dist\PathMgr\i386\PathMgr.dll"; DestDir: "{app}\i386"; Flags: uninsneveruninstall
+Source: "dist\PathMgr\x86_64\PathMgr.dll"; DestDir: "{app}\x86_64"; Check: Is64BitInstallMode()
+Source: "assets\install-release.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "dist\client\{#MyAppFileName}_windows_386_sse2\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode()
 Source: "dist\client\{#MyAppFileName}_windows_amd64_v1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode() and not IsArm64()
 Source: "dist\client\{#MyAppFileName}_windows_arm64_v8.0\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: IsArm64()
 
-[Run]
-Filename: "{cmd}"; Parameters: "/c mklink /H ""{app}\install-release.exe"" ""{app}\ir.exe"""; Flags: runhidden
-
-[UninstallDelete]
-Type: files; Name: "{app}\install-release.exe"
+;[Run]
+;Filename: "{cmd}"; Parameters: "/c mklink /H ""{app}\install-release.exe"" ""{app}\ir.exe"""; Flags: runhidden
 
 [Icons]
 Name: "{group}\{#MyAppName} Folder"; Filename: "{app}"
@@ -79,7 +77,7 @@ function DLLAddDirToPath(DirName: string; PathType, AddType: DWORD): DWORD;
 
 // Import RemoveDirFromPath() at uninstall time ('{app}\' prefix)
 function DLLRemoveDirFromPath(DirName: string; PathType: DWORD): DWORD;
-  external 'RemoveDirFromPath@{app}\PathMgr.dll stdcall uninstallonly';
+  external 'RemoveDirFromPath@{app}\i386\PathMgr.dll stdcall uninstallonly';
 
 // Wrapper for AddDirToPath() DLL function
 function AddDirToPath(const DirName: string): DWORD;
@@ -164,8 +162,9 @@ begin
   if ApplicationUninstalled then
   begin
     // Unload and delete PathMgr.dll and remove app dir when uninstalling
-    UnloadDLL(ExpandConstant('{app}\PathMgr.dll'));
-    DeleteFile(ExpandConstant('{app}\PathMgr.dll'));
+    UnloadDLL(ExpandConstant('{app}\i386\PathMgr.dll'));
+    DeleteFile(ExpandConstant('{app}\i386\PathMgr.dll'));
+    RemoveDir(ExpandConstant('{app}\i386'));
     RemoveDir(ExpandConstant('{app}'));
   end;
 end;
