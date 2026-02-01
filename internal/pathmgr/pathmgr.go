@@ -7,6 +7,7 @@ func CheckBinPath(binPath string) {
 	result, _, _ := IsDirInPath(binPath)
 	fmt.Printf("result: %v\n", result)
 	if !result {
-		fmt.Printf("The bin path NOT in the PATH!\n")
+		fmt.Printf("Warning: bin directory not in PATH!\n")
+		fmt.Printf("To add to path run:\nir path add %s\n", binPath)
 	}
 }

@@ -8,7 +8,7 @@
 #define MyAppFileName "ir"
 
 [Setup]
-AppId={{5A1C755C-43D6-4445-BFC9-ABF23CEEF33E}
+AppId={{77FFF241-28DE-450E-AE6F-00CD662B8DE3}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
@@ -50,6 +50,12 @@ Source: "dist\PathMgr\x86_64\PathMgr.dll"; DestDir: "{app}"; Flags: uninsneverun
 Source: "dist\client\{#MyAppFileName}_windows_386_sse2\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode()
 Source: "dist\client\{#MyAppFileName}_windows_amd64_v1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode() and not IsArm64()
 Source: "dist\client\{#MyAppFileName}_windows_arm64_v8.0\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Check: IsArm64()
+
+[Run]
+Filename: "{cmd}"; Parameters: "/c mklink /H ""{app}\install-release.exe"" ""{app}\ir.exe"""; Flags: runhidden
+
+[UninstallDelete]
+Type: files; Name: "{app}\install-release.exe"
 
 [Icons]
 Name: "{group}\{#MyAppName} Folder"; Filename: "{app}"

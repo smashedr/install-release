@@ -5,6 +5,7 @@ import (
 	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
 	"strings"
 )
 
@@ -59,7 +60,9 @@ var pathCmd = &cobra.Command{
 			fmt.Printf("findType: %v\n", findType)
 			fmt.Printf("err: %v\n", err)
 		default:
+			fmt.Printf("Unknown command: %v\n", command)
 			fmt.Printf("Usage: [check/add/remove] [path]\n")
+			os.Exit(1)
 		}
 	},
 }

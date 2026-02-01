@@ -7,6 +7,7 @@ import (
 	_ "github.com/bartventer/httpcache/store/fscache"
 	"github.com/google/go-github/v58/github"
 	"github.com/mholt/archives"
+	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"io"
@@ -225,6 +226,8 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 	if err := os.Rename(largestFile, destPath); err != nil {
 		return err
 	}
+
+	pathmgr.CheckBinPath(binPath)
 
 	fmt.Printf("\nAll Done...\n")
 	return nil

@@ -46,13 +46,13 @@ Alternatively, you can manually [download a release](https://github.com/smashedr
 Install the latest release.
 
 ```shell
-install-release owner/repo
+ir owner/repo
 ```
 
 Install a specific version.
 
 ```shell
-install-release owner/repo v4.2.0
+ir owner/repo v4.2.0
 ```
 
 &nbsp;

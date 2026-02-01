@@ -3,6 +3,7 @@
 package pathmgr
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,5 +31,6 @@ func IsDirInPath(dirPath string) (found bool, pathType uint32, err error) {
 }
 
 func AddDirToPath(dirPath string, pathType, addType int) (bool, int, error) {
+	fmt.Printf("This method only works on Windows currently.\n")
 	return false, 0, nil
 }

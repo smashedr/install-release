@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -17,6 +18,7 @@ var infoCmd = &cobra.Command{
 		binPath := viper.GetString("bin")
 		fmt.Printf("binPath: %v\n", binPath)
 		fmt.Printf("ConfigFileUsed: %s\n", viper.ConfigFileUsed())
+		pathmgr.CheckBinPath(binPath)
 	},
 }
 
