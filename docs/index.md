@@ -38,7 +38,7 @@ Easily Install GitHub Release binaries with Windows support.
 
 --8<-- "docs/snippets/install.md"
 
-Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_windows_installer.exe).  
+Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).  
 Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
 
 ## :lucide-terminal: Usage

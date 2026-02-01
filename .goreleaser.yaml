@@ -48,12 +48,12 @@ dockers_v2:
     disable: "{{ or .IsSnapshot .Prerelease }}"
 
 brews:
-  - repository:
-      owner: smashedr
-      name: homebrew-test
-      token: "{{ .Env.GITHUB_TOKEN }}"
+  - name: install-release
     directory: Formula
     homepage: "https://github.com/smashedr/{{ .ProjectName }}"
+    install: |
+      bin.install "ir"
+      bin.install_symlink "install-release" => "ir"
     description: "CLI to Install a GitHub Release"
     license: "MIT"
     test: |
@@ -61,7 +61,10 @@ brews:
     caveats: |
       View the Documentation:
       https://smashedr.github.io/install-release/
-
+    #repository:
+    #  owner: smashedr
+    #  name: homebrew-test
+    #  token: "{{ .Env.GITHUB_TOKEN }}"
     skip_upload: true
 
 #changelog:

@@ -53,7 +53,7 @@ brew install smashedr/test/install-release
 curl https://i.jpillora.com/smashedr/install-release! | bash
 ```
 
-Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_windows_installer.exe).  
+Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).  
 Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
 
 #### Docker

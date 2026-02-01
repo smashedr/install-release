@@ -26,7 +26,7 @@ DisableFinishedPage=yes
 InfoBeforeFile=assets\pre-install.rtf
 InfoAfterFile=assets\post-install.rtf
 
-OutputBaseFilename={#MyAppFileName}_windows_installer
+OutputBaseFilename={#MyAppFileName}_Windows_Installer
 OutputDir=out
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
