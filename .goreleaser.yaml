@@ -53,7 +53,7 @@ brews:
     homepage: "https://github.com/smashedr/{{ .ProjectName }}"
     install: |
       bin.install "ir"
-      bin.install_symlink "install-release" => "ir"
+      bin.install_symlink "ir" => "install-release"
     description: "CLI to Install a GitHub Release"
     license: "MIT"
     test: |
