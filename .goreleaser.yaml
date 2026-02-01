@@ -61,10 +61,10 @@ brews:
     caveats: |
       View the Documentation:
       https://smashedr.github.io/install-release/
-    #repository:
-    #  owner: smashedr
-    #  name: homebrew-test
-    #  token: "{{ .Env.GITHUB_TOKEN }}"
+    repository:
+      owner: smashedr
+      name: homebrew-test
+      token: "{{ .Env.GITHUB_TOKEN }}"
     skip_upload: true
 
 #changelog:
