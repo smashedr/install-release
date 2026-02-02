@@ -59,8 +59,10 @@ Alternatively, you can manually [download a release](https://github.com/smashedr
 #### Docker
 
 ```shell
-docker run --rm ghcr.io/smashedr/install-release:latest
+docker run --rm -v ~/bin:/out ghcr.io/smashedr/ir:latest-amd64 --bin=/out owner/repo
 ```
+
+_Note: Docker currently requires you to mount your bin directory and specify the path._
 
 #### Source
 
