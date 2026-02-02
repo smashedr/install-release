@@ -55,7 +55,7 @@ jobs:
       - name: "Setup Go"
         uses: actions/setup-go@v5
         with:
-          go-version: stable
+          go-version-file: go.mod
 
       - name: "GoReleaser"
         id: go
@@ -204,8 +204,8 @@ jobs:
         uses: re-actors/alls-green@release/v1
         with:
           jobs: ${{ toJSON(needs) }}
+          allowed-skips: release
           #allowed-failures: docs, linters
-          #allowed-skips: non-voting-flaky-job
 
       - name: "Cleanup Release"
         if: ${{ failure() }}

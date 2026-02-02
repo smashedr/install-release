@@ -16,6 +16,7 @@ builds:
   - env:
       - CGO_ENABLED=0
 
+# https://goreleaser.com/customization/archive/
 archives:
   - formats: [tar.gz]
     # this name template makes the OS and Arch compatible with the results of `uname`.
@@ -31,6 +32,7 @@ archives:
       - goos: windows
         formats: [zip]
 
+# https://goreleaser.com/customization/dockers_v2/
 dockers_v2:
   - images:
       - "ghcr.io/smashedr/{{ .ProjectName }}"
@@ -47,25 +49,30 @@ dockers_v2:
       "org.opencontainers.image.source": "{{ .GitURL }}"
     disable: "{{ or .IsSnapshot .Prerelease }}"
 
+# https://goreleaser.com/customization/homebrew_formulas/
 brews:
   - name: install-release
-    directory: Formula
-    homepage: "https://github.com/smashedr/{{ .ProjectName }}"
-    install: |
-      bin.install "ir"
-      bin.install_symlink "ir" => "install-release"
-    description: "CLI to Install a GitHub Release"
-    license: "MIT"
-    test: |
-      assert_match version.to_s, shell_output("#{bin}/install-release -V")
-    caveats: |
-      View the Documentation:
-      https://smashedr.github.io/install-release/
     repository:
       owner: smashedr
       name: homebrew-test
       token: "{{ .Env.GITHUB_TOKEN }}"
     skip_upload: true
+    directory: Formula
+    homepage: "https://smashedr.github.io/{{ .ProjectName }}"
+    description: "CLI to Install a GitHub Release"
+    license: "MIT"
+    install: |
+      bin.install "ir"
+      bin.install_symlink "ir" => "install-release"
+    test: |
+      assert_match version.to_s, shell_output("#{bin}/install-release -V")
+    caveats: |
+      View the Documentation:
+      https://smashedr.github.io/install-release/
+
+# https://goreleaser.com/customization/release/
+release:
+  replace_existing_artifacts: true
 
 #changelog:
 #  sort: asc
@@ -73,6 +80,3 @@ brews:
 #    exclude:
 #      - "^docs:"
 #      - "^test:"
-
-release:
-  replace_existing_artifacts: true
