@@ -178,6 +178,7 @@ jobs:
         uses: cssnr/homebrew-action@master
         with:
           formula: ${{ env.formula }}
+          message: Bump ${{ env.formula }} to ${{ github.ref_name }}
           file: dist/client/homebrew/Formula/${{ env.formula }}
           repo: ${{ env.tap-owner }}/${{ env.tap-repo }}
           token: ${{ steps.app.outputs.token }}

@@ -223,8 +223,24 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 	// Step 3: move it to binPath
 	destPath := filepath.Join(binPath, filepath.Base(largestFile))
 	fmt.Printf("destPath: %v\n", destPath)
-	if err := os.Rename(largestFile, destPath); err != nil {
-		return err
+	//if err := os.Rename(largestFile, destPath); err != nil {
+	//	return err
+	//}
+
+	// Read the file content
+	data, err := os.ReadFile(largestFile)
+	if err != nil {
+		return fmt.Errorf("failed to read file: %w", err)
+	}
+	// Write to destination with executable permissions
+	err = os.WriteFile(destPath, data, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+	// Remove the source file
+	err = os.Remove(largestFile)
+	if err != nil {
+		return fmt.Errorf("failed to remove temp file: %w", err)
 	}
 
 	pathmgr.CheckBinPath(binPath)
