@@ -21,13 +21,29 @@ import (
 	"time"
 )
 
-func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
+func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	vprintf(1, "args: %v\n", args)
 	binPath := viper.GetString("bin")
 	vprintf(1, "binPath: %v\n", binPath)
 	if len(args) == 0 {
 		return fmt.Errorf("repository argument required")
 	}
+
+	assetSelect, err := cmd.Flags().GetBool("select")
+	if err != nil {
+		return err
+	}
+	vprintf(1, "select flag: %v\n", assetSelect)
+	assetName, err := cmd.Flags().GetString("asset")
+	if err != nil {
+		return err
+	}
+	vprintf(1, "asset flag: %q\n", assetName)
+	destName, err := cmd.Flags().GetString("name")
+	if err != nil {
+		return err
+	}
+	vprintf(1, "name flag: %q\n", destName)
 
 	repository := args[0]
 	vprintf(1, "repository: %v\n", repository)
@@ -45,7 +61,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 	if len(args) > 1 {
 		tag = args[1]
 	}
-	fmt.Printf("%s/%s/%s\n", owner, repo, tag)
+	fmt.Printf("Installing: %s/%s/%s\n", owner, repo, tag)
 
 	vprintf(1, "GOOS: %v\n", runtime.GOOS)
 	vprintf(1, "GOARCH: %v\n", runtime.GOARCH)
@@ -61,7 +77,6 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 	// Release
 	ctx := context.Background()
 	var release *github.RepositoryRelease
-	var err error
 	if tag == "latest" {
 		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
 	} else {
@@ -71,11 +86,14 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 		fmt.Printf("Get Release error: %v\n", err)
 		return err
 	}
-	//fmt.Printf("release: %v\n\n", release)
-	//fmt.Printf("release.Assets: %v\n\n", release.Assets)
+	vprintf(3, "release: %v\n\n", release)
+	vprintf(3, "release.Assets: %v\n\n", release.Assets)
 
 	// Asset
-	asset := filterAssets(release.Assets, runtime.GOOS, runtime.GOARCH)
+	var asset *github.ReleaseAsset
+	if !assetSelect {
+		asset = filterAssets(release.Assets, assetName, runtime.GOOS, runtime.GOARCH)
+	}
 	vprintf(2, "\nasset: %v\n\n", asset)
 
 	if asset == nil {
@@ -85,7 +103,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 		}
 		vprintf(1, "assetNames: %v\n", assetNames)
 		prompt := promptui.Select{
-			Label: "Select Bin Directory",
+			Label: "Select Asset to Install",
 			Items: assetNames,
 		}
 		_, result, err := prompt.Run()
@@ -93,7 +111,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 			fmt.Printf("Prompt failed %v\n", err)
 			return err
 		}
-		fmt.Printf("You choose %q\n", result)
+		fmt.Printf("You choose: %q\n", result)
 
 		for i := range release.Assets {
 			if *release.Assets[i].Name == result {
@@ -108,7 +126,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 	}
 
 	vprintf(1, "id: %v\n", asset.GetID())
-	fmt.Printf("url: %v\n", asset.GetBrowserDownloadURL())
+	fmt.Printf("url: %s\n", asset.GetBrowserDownloadURL())
 
 	// Download to Memory?
 	rc, _, err := client.Repositories.DownloadReleaseAsset(
@@ -146,6 +164,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 		return err
 	}
 
+	// TODO: Make this a function that uses asset as binary if not archive...
 	// Identify Archive Format
 	format, stream, err := archives.Identify(context.Background(), tmpFile.Name(), tmpFile)
 	if err != nil {
@@ -155,7 +174,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 	if format == nil {
 		return fmt.Errorf("unable to identify archive format")
 	}
-	vprintf(1, "format: %v\n", format)
+	vprintf(2, "format: %v\n", format)
 
 	// Extract if it's an archive
 	tmpDir, err := os.MkdirTemp("", "archive-extract-*")
@@ -250,8 +269,12 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 	}
 
 	// Step 3: move it to binPath
-	destPath := filepath.Join(binPath, filepath.Base(largestFile))
-	fmt.Printf("destPath: %v\n", destPath)
+	if destName == "" {
+		destName = filepath.Base(largestFile)
+	}
+	vprintf(1, "destName: %v\n", destName)
+	destPath := filepath.Join(binPath, destName)
+	vprintf(1, "destPath: %v\n", destPath)
 	//if err := os.Rename(largestFile, destPath); err != nil {
 	//	return err
 	//}
@@ -274,7 +297,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 
 	pathmgr.CheckBinPath(binPath)
 
-	fmt.Printf("\nAll Done...\n")
+	fmt.Printf("\nSuccessfully Installed: %s\n", destName)
 	return nil
 }
 
@@ -283,7 +306,27 @@ var archAliases = map[string][]string{
 	"arm64": {"arm64", "aarch64"},
 }
 
-func filterAssets(assets []*github.ReleaseAsset, os, arch string) *github.ReleaseAsset {
+func filterAssets(assets []*github.ReleaseAsset, assetName, os, arch string) *github.ReleaseAsset {
+	if assetName != "" {
+		return findAssetByName(assets, assetName)
+	}
+	return findAssetByPlatform(assets, os, arch)
+}
+
+func findAssetByName(assets []*github.ReleaseAsset, assetName string) *github.ReleaseAsset {
+	vprintf(1, "findAssetByName: %v\n", assetName)
+	assetName = strings.ToLower(assetName)
+	for _, asset := range assets {
+		if strings.ToLower(asset.GetName()) == assetName {
+			vprintf(1, "matched: %v\n", asset.Name)
+			return asset
+		}
+	}
+	return nil
+}
+
+func findAssetByPlatform(assets []*github.ReleaseAsset, os, arch string) *github.ReleaseAsset {
+	vprintf(1, "findAssetByPlatform: %v - %v\n", os, arch)
 	aliases := archAliases[arch]
 	if aliases == nil {
 		aliases = []string{arch}
@@ -296,7 +339,7 @@ func filterAssets(assets []*github.ReleaseAsset, os, arch string) *github.Releas
 		if strings.Contains(name, os) {
 			for _, arch := range aliases {
 				if strings.Contains(name, arch) {
-					vprintf(1, "matched: %v\n", name)
+					vprintf(1, "matched: %v\n", asset.Name)
 					return asset
 				}
 			}

@@ -34,6 +34,9 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.Flags().BoolP("version", "V", false, "show installed version")
+	rootCmd.Flags().BoolP("select", "s", false, "select from a list of assets")
+	rootCmd.Flags().StringP("asset", "a", "", "asset name to download")
+	rootCmd.Flags().StringP("name", "n", "", "binary file name to use")
 	rootCmd.Flags().StringP("bin", "b", "", "bin path to use")
 	_ = viper.BindPFlag("bin", rootCmd.Flags().Lookup("bin"))
 
