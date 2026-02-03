@@ -56,19 +56,19 @@ curl https://i.jpillora.com/smashedr/install-release! | bash
 Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).  
 Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
 
-#### Docker
-
-```shell
-docker run --rm -v ~/bin:/out ghcr.io/smashedr/ir:latest-amd64 --bin=/out owner/repo
-```
-
-_Note: Docker currently requires you to mount your bin directory and specify the path._
-
 #### Source
 
 ```shell
 go install github.com/smashedr/install-release@latest
 ```
+
+#### Docker
+
+```shell
+docker run --rm -v ~/bin:/out ghcr.io/smashedr/ir:latest --bin=/out owner/repo
+```
+
+_Note: Docker requires you to mount your bin directory and specify the path._
 
 [![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
 
