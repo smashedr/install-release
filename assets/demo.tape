@@ -4,15 +4,15 @@ Output dist/demo.gif
 
 Require ir
 
-Set Theme "Catppuccin Frappe"
-Set MarginFill "#6B50FF"
+Set Theme "MaterialDark"
+Set MarginFill "#00ADD8"
 Set Margin 10
 Set WindowBar Colorful
-Set BorderRadius 10
-Set Padding 30
+Set BorderRadius 12
+Set Padding 20
 Set Width 1200
-Set Height 900
-Set FontSize 26
+Set Height 960
+Set FontSize 34
 
 
 Type "ir smashedr/bup"

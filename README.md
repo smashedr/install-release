@@ -33,11 +33,11 @@ CLI to Install a GitHub Release.
 
 Easily Install GitHub Release binaries with Windows support.
 
+[![VHS Tape](https://raw.githubusercontent.com/smashedr/repo-images/refs/heads/master/install-release/demo.gif)](https://smashedr.github.io/install-release/)
+
 > [!IMPORTANT]  
 > This project is in development.
 > It is functional but may have bugs.
-
-[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
 
 ## Install
 
@@ -69,6 +69,8 @@ _Note: Docker currently requires you to mount your bin directory and specify the
 ```shell
 go install github.com/smashedr/install-release@latest
 ```
+
+[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
 
 ## Usage
 
