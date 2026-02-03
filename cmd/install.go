@@ -6,6 +6,7 @@ import (
 	"github.com/bartventer/httpcache"
 	_ "github.com/bartventer/httpcache/store/fscache"
 	"github.com/google/go-github/v58/github"
+	"github.com/manifoldco/promptui"
 	"github.com/mholt/archives"
 	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
@@ -21,16 +22,15 @@ import (
 )
 
 func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
-	fmt.Printf("--------------------\n")
-	fmt.Printf("args: %v\n", args)
+	vprintf(1, "args: %v\n", args)
 	binPath := viper.GetString("bin")
-	fmt.Printf("binPath: %v\n", binPath)
+	vprintf(1, "binPath: %v\n", binPath)
 	if len(args) == 0 {
 		return fmt.Errorf("repository argument required")
 	}
 
 	repository := args[0]
-	fmt.Printf("repository: %v\n", repository)
+	vprintf(1, "repository: %v\n", repository)
 	if !strings.Contains(repository, "/") {
 		//return fmt.Errorf("repository must be in format: owner/repo")
 		_, _ = fmt.Fprintln(os.Stderr, "repository must be in format: owner/repo")
@@ -40,16 +40,15 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 	parts := strings.Split(repository, "/")
 	owner := parts[0]
 	repo := parts[1]
-	fmt.Printf("%s/%s\n", owner, repo)
 
 	tag := "latest"
 	if len(args) > 1 {
 		tag = args[1]
 	}
-	fmt.Printf("tag: %v\n", tag)
+	fmt.Printf("%s/%s/%s\n", owner, repo, tag)
 
-	fmt.Printf("GOOS: %v\n", runtime.GOOS)
-	fmt.Printf("GOARCH: %v\n", runtime.GOARCH)
+	vprintf(1, "GOOS: %v\n", runtime.GOOS)
+	vprintf(1, "GOARCH: %v\n", runtime.GOARCH)
 
 	// Cache
 	dsn := "fscache://?appname=install-release"
@@ -77,8 +76,38 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 
 	// Asset
 	asset := filterAssets(release.Assets, runtime.GOOS, runtime.GOARCH)
-	//fmt.Printf("\nasset: %v\n\n", asset)
-	fmt.Printf("id: %v\n", asset.GetID())
+	vprintf(2, "\nasset: %v\n\n", asset)
+
+	if asset == nil {
+		var assetNames []string
+		for _, asset := range release.Assets {
+			assetNames = append(assetNames, *asset.Name)
+		}
+		vprintf(1, "assetNames: %v\n", assetNames)
+		prompt := promptui.Select{
+			Label: "Select Bin Directory",
+			Items: assetNames,
+		}
+		_, result, err := prompt.Run()
+		if err != nil {
+			fmt.Printf("Prompt failed %v\n", err)
+			return err
+		}
+		fmt.Printf("You choose %q\n", result)
+
+		for i := range release.Assets {
+			if *release.Assets[i].Name == result {
+				asset = release.Assets[i]
+				break
+			}
+		}
+		if asset == nil {
+			return fmt.Errorf("no asset found")
+		}
+		vprintf(2, "\nasset: %v\n\n", asset)
+	}
+
+	vprintf(1, "id: %v\n", asset.GetID())
 	fmt.Printf("url: %v\n", asset.GetBrowserDownloadURL())
 
 	// Download to Memory?
@@ -101,7 +130,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 		_ = os.Remove(tmpFile.Name())
 	}()
 
-	fmt.Printf("tmpFile: %v\n", tmpFile.Name())
+	vprintf(1, "tmpFile: %v\n", tmpFile.Name())
 
 	// Write Download to File
 	_, err = io.Copy(tmpFile, rc)
@@ -126,7 +155,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 	if format == nil {
 		return fmt.Errorf("unable to identify archive format")
 	}
-	fmt.Printf("format: %v\n", format)
+	vprintf(1, "format: %v\n", format)
 
 	// Extract if it's an archive
 	tmpDir, err := os.MkdirTemp("", "archive-extract-*")
@@ -177,7 +206,7 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 		return err
 	}
 
-	fmt.Printf("tmpDir: %v\n", tmpDir)
+	vprintf(1, "tmpDir: %v\n", tmpDir)
 
 	// Step 1: find the largest file
 	var largestFile string
@@ -203,11 +232,11 @@ func runInstall(_ *cobra.Command, args []string) error { // NOSONAR
 		return err
 	}
 
-	fmt.Printf("largestFile: %v\n", largestFile)
+	vprintf(1, "largestFile: %v\n", largestFile)
 	if largestFile == "" {
 		return fmt.Errorf("no files found in tmpDir")
 	}
-	fmt.Printf("largestSize: %v\n", largestSize)
+	vprintf(1, "largestSize: %v\n", largestSize)
 
 	// Step 2: make sure it's executable
 	info, err := os.Stat(largestFile)
@@ -259,15 +288,15 @@ func filterAssets(assets []*github.ReleaseAsset, os, arch string) *github.Releas
 	if aliases == nil {
 		aliases = []string{arch}
 	}
-	fmt.Printf("aliases: %v\n", aliases)
+	vprintf(1, "aliases: %v\n", aliases)
 
 	for _, asset := range assets {
 		name := strings.ToLower(asset.GetName())
-		fmt.Printf("name: %v\n", name)
+		vprintf(2, "name: %v\n", name)
 		if strings.Contains(name, os) {
 			for _, arch := range aliases {
 				if strings.Contains(name, arch) {
-					fmt.Printf("matched: %v\n", name)
+					vprintf(1, "matched: %v\n", name)
 					return asset
 				}
 			}

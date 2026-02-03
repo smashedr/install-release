@@ -1,5 +1,4 @@
-# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
-# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 
 env:
@@ -53,6 +52,16 @@ tasks:
       mkdir -p dist
       wget https://github.com/Bill-Stewart/PathMgr/releases/download/v2.0.0/PathMgr-2.0.0.zip -O dist/pathmgr.zip
       unzip dist/pathmgr.zip -d dist/PathMgr
+
+  vhs:
+    desc: Create VHS Tape
+    vars:
+      TAPE_FILE: '{{.CLI_ARGS | default "demo.tape"}}'
+    cmds:
+      - echo "Creating Tape - {{.TAPE_FILE}}"
+      - cp -f "assets/{{.TAPE_FILE}}" "{{.TAPE_FILE}}"
+      - vhs "{{.TAPE_FILE}}"
+      - defer: rm -f "{{.TAPE_FILE}}"
 
   test:
     if: test ! -d dist/PathMgr
