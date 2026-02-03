@@ -22,10 +22,9 @@ var pathCmd = &cobra.Command{
 	//Args:  cobra.MinimumNArgs(1),
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("--------------------\n")
-		fmt.Printf("args: %s\n", args)
+		vprintf(1, "args: %s\n", args)
 		binPath := viper.GetString("bin")
-		fmt.Printf("binPath: %v\n", binPath)
+		vprintf(1, "binPath: %v\n", binPath)
 
 		//var command string
 		//var path string
@@ -47,7 +46,6 @@ var pathCmd = &cobra.Command{
 		switch command {
 		case "a", "ad", "add":
 			added, ret, err := pathmgr.AddDirToPath(path, 1, 0)
-			fmt.Printf("--------------------\n")
 			fmt.Printf("added: %v\n", added)
 			fmt.Printf("ret: %v\n", ret)
 			fmt.Printf("err: %v\n", err)

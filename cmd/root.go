@@ -9,12 +9,15 @@ import (
 	"path/filepath"
 )
 
+var verbose int
+
 var rootCmd = &cobra.Command{
-	Use:   "install-release owner/repo [tag]",
-	Short: "CLI to Install a GitHub Release",
-	Long:  "Easily Install GitHub Release binaries with Windows support.",
-	Args:  cobra.ArbitraryArgs,
-	RunE:  runInstall,
+	Use:           "install-release owner/repo [tag]",
+	Short:         "CLI to Install a GitHub Release",
+	Long:          "Easily Install GitHub Release binaries with Windows support.",
+	Args:          cobra.MinimumNArgs(1),
+	RunE:          runInstall,
+	SilenceErrors: true,
 }
 
 func SetVersionInfo(version, commit, date string) {
@@ -33,6 +36,9 @@ func init() {
 	rootCmd.Flags().BoolP("version", "V", false, "show installed version")
 	rootCmd.Flags().StringP("bin", "b", "", "bin path to use")
 	_ = viper.BindPFlag("bin", rootCmd.Flags().Lookup("bin"))
+
+	//rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
+	rootCmd.PersistentFlags().CountVarP(&verbose, "verbose", "v", "verbose output (-vvv debug)")
 }
 
 func initConfig() {
@@ -49,33 +55,34 @@ func initConfig() {
 	viper.AddConfigPath("$HOME/Library/Application Support")
 
 	homeDir, err := os.UserHomeDir()
-	fmt.Printf("homeDir: %s\n", homeDir)
+	vprintf(2, "homeDir: %s\n", homeDir)
 	if err != nil {
 		homeDir = "." // fallback to retarded AI
 	}
 	defaultBinPath := filepath.Join(homeDir, "bin")
-	fmt.Printf("defaultBinPath: %s\n", defaultBinPath)
+	vprintf(2, "defaultBinPath: %s\n", defaultBinPath)
 	viper.SetDefault("bin", defaultBinPath)
 
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("viper.ConfigFileUsed: %s\n", viper.ConfigFileUsed())
+		vprintf(2, "viper.ConfigFileUsed: %s\n", viper.ConfigFileUsed())
 		configPath := filepath.Join(homeDir, ".config")
-		fmt.Printf("configPath: %s\n", configPath)
+		vprintf(2, "configPath: %s\n", configPath)
 		_ = os.MkdirAll(configPath, 0755)
 		configFile := filepath.Join(configPath, configName+".yaml")
-		fmt.Printf("configFile: %s\n", configFile)
+		vprintf(2, "configFile: %s\n", configFile)
 		viper.SetConfigFile(configFile)
 		_ = viper.SafeWriteConfigAs(configFile)
 		if err := viper.ReadInConfig(); err != nil {
 			fmt.Printf("Error reading config: %s\nUsing Default Config!", configFile)
 		}
-		fmt.Printf("1 Config File: %s\n", configFile)
+		vprintf(1, "Config File: %s\n", configFile)
 	} else {
-		fmt.Printf("2 Config File: %s\n", viper.ConfigFileUsed())
+		vprintf(1, "Config File: %s\n", viper.ConfigFileUsed())
 	}
 
 	binPath := viper.GetString("bin")
-	fmt.Printf("binPath: %v\n", binPath)
+	vprintf(1, "binPath: %v\n", binPath)
+	vprintf(1, "--------------------\n")
 	if err = os.MkdirAll(binPath, 0755); err != nil {
 		log.Fatal("Error creating bin directory!")
 	}
