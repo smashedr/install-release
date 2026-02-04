@@ -25,9 +25,6 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	vprintf(1, "args: %v\n", args)
 	binPath := viper.GetString("bin")
 	vprintf(1, "binPath: %v\n", binPath)
-	if len(args) == 0 {
-		return fmt.Errorf("repository argument required")
-	}
 
 	assetSelect, err := cmd.Flags().GetBool("select")
 	if err != nil {
@@ -48,9 +45,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	repository := args[0]
 	vprintf(1, "repository: %v\n", repository)
 	if !strings.Contains(repository, "/") {
-		//return fmt.Errorf("repository must be in format: owner/repo")
-		_, _ = fmt.Fprintln(os.Stderr, "repository must be in format: owner/repo")
-		os.Exit(1)
+		return fmt.Errorf("repository must be in format: owner/repo")
 	}
 
 	parts := strings.Split(repository, "/")
@@ -83,8 +78,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
 	}
 	if err != nil {
-		fmt.Printf("Get Release error: %v\n", err)
-		return err
+		return fmt.Errorf("get release error: %w", err)
 	}
 	vprintf(3, "release: %v\n\n", release)
 	vprintf(3, "release.Assets: %v\n\n", release.Assets)
@@ -108,8 +102,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		}
 		_, result, err := prompt.Run()
 		if err != nil {
-			fmt.Printf("Prompt failed %v\n", err)
-			return err
+			return fmt.Errorf("prompt failed %w", err)
 		}
 		fmt.Printf("You choose: %q\n", result)
 
@@ -140,8 +133,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	// Create Temp File
 	tmpFile, err := os.CreateTemp("", "ir-asset-*")
 	if err != nil {
-		fmt.Printf("Create Temp error: %v\n", err)
-		return err
+		return fmt.Errorf("create temp error: %w", err)
 	}
 	defer func() {
 		_ = tmpFile.Close()
@@ -153,23 +145,20 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	// Write Download to File
 	_, err = io.Copy(tmpFile, rc)
 	if err != nil {
-		fmt.Printf("Write File error: %v\n", err)
-		return err
+		return fmt.Errorf("write File error: %w", err)
 	}
 
 	// Seek Back to Start of File
 	_, err = tmpFile.Seek(0, 0)
 	if err != nil {
-		fmt.Printf("Seek error: %v\n", err)
-		return err
+		return fmt.Errorf("seek error: %w", err)
 	}
 
 	// TODO: Make this a function that uses asset as binary if not archive...
 	// Identify Archive Format
 	format, stream, err := archives.Identify(context.Background(), tmpFile.Name(), tmpFile)
 	if err != nil {
-		fmt.Printf("Identify Format error: %v\n", err)
-		return err
+		return fmt.Errorf("identify Format error: %w", err)
 	}
 	if format == nil {
 		return fmt.Errorf("unable to identify archive format")
