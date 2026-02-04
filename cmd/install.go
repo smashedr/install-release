@@ -21,6 +21,11 @@ import (
 	"time"
 )
 
+var archAliases = map[string][]string{
+	"amd64": {"amd64", "x86_64", "x64"},
+	"arm64": {"arm64", "aarch64"},
+}
+
 func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	vprintf(1, "args: %v\n", args)
 	binPath := viper.GetString("bin")
@@ -130,7 +135,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	}
 	defer func() { _ = rc.Close() }()
 
-	// Create Temp File
+	// Create Temp File for the Asset Download
 	tmpFile, err := os.CreateTemp("", "ir-asset-*")
 	if err != nil {
 		return fmt.Errorf("create temp error: %w", err)
@@ -154,30 +159,84 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		return fmt.Errorf("seek error: %w", err)
 	}
 
-	// TODO: Make this a function that uses asset as binary if not archive...
 	// Identify Archive Format
 	format, stream, err := archives.Identify(context.Background(), tmpFile.Name(), tmpFile)
 	if err != nil {
-		return fmt.Errorf("identify Format error: %w", err)
-	}
-	if format == nil {
-		return fmt.Errorf("unable to identify archive format")
+		vprintf(1, "identify Format error: %v\n", err)
 	}
 	vprintf(2, "format: %v\n", format)
 
-	// Extract if it's an archive
+	// Create Temp Directory for Archive Extraction
 	tmpDir, err := os.MkdirTemp("", "archive-extract-*")
 	if err != nil {
 		return err
 	}
 	defer func() { _ = os.RemoveAll(tmpDir) }()
+	vprintf(1, "tmpDir: %v\n", tmpDir)
 
-	ex, ok := format.(archives.Extractor)
-	if !ok {
-		return fmt.Errorf("format does not support extraction")
+	// Check format set binaryFilePath and destName
+	var binaryFilePath string
+	if format != nil {
+		// Archive
+		binaryFilePath, err = extractArchive(format, stream, tmpDir)
+		if err != nil {
+			return err
+		}
+		if destName == "" {
+			destName = filepath.Base(binaryFilePath)
+		}
+	} else {
+		// Binary
+		binaryFilePath = tmpFile.Name()
+		if destName == "" {
+			destName = repo
+		}
+	}
+	vprintf(1, "binaryFilePath: %v\n", binaryFilePath)
+	vprintf(1, "destName: %v\n", destName)
+
+	// Make sure it is executable
+	info, err := os.Stat(binaryFilePath)
+	if err != nil {
+		return err
+	}
+	mode := info.Mode() | 0111 // add executable bits
+	if err := os.Chmod(binaryFilePath, mode); err != nil {
+		return err
 	}
 
-	err = ex.Extract(context.Background(), stream, func(ctx context.Context, f archives.FileInfo) error {
+	// Move it to binPath
+	destPath := filepath.Join(binPath, destName)
+	vprintf(1, "destPath: %v\n", destPath)
+	// os.Rename does NOT work across volumes
+	//if err := os.Rename(binaryFilePath, destPath); err != nil {
+	//	return err
+	//}
+	// Read the file content
+	data, err := os.ReadFile(binaryFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to read file: %w", err)
+	}
+	// Write to destination with executable permissions
+	err = os.WriteFile(destPath, data, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+
+	// WIP
+	pathmgr.CheckBinPath(binPath)
+
+	fmt.Printf("\nSuccessfully Installed: %s\n", destName)
+	return nil
+}
+
+func extractArchive(format archives.Format, stream io.Reader, tmpDir string) (string, error) { // NOSONAR
+	ex, ok := format.(archives.Extractor)
+	if !ok {
+		return "", fmt.Errorf("format does not support extraction")
+	}
+
+	err := ex.Extract(context.Background(), stream, func(ctx context.Context, f archives.FileInfo) error {
 		targetPath := filepath.Join(tmpDir, f.NameInArchive)
 
 		// Prevent ZipSlip-style path traversal
@@ -209,12 +268,9 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		_, err = io.Copy(out, file)
 		return err
 	})
-
 	if err != nil {
-		return err
+		return "", err
 	}
-
-	vprintf(1, "tmpDir: %v\n", tmpDir)
 
 	// Step 1: find the largest file
 	var largestFile string
@@ -237,62 +293,15 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		return nil
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	vprintf(1, "largestFile: %v\n", largestFile)
 	if largestFile == "" {
-		return fmt.Errorf("no files found in tmpDir")
+		return largestFile, fmt.Errorf("no files found in tmpDir")
 	}
 	vprintf(1, "largestSize: %v\n", largestSize)
-
-	// Step 2: make sure it's executable
-	info, err := os.Stat(largestFile)
-	if err != nil {
-		return err
-	}
-
-	mode := info.Mode() | 0111 // add executable bits
-	if err := os.Chmod(largestFile, mode); err != nil {
-		return err
-	}
-
-	// Step 3: move it to binPath
-	if destName == "" {
-		destName = filepath.Base(largestFile)
-	}
-	vprintf(1, "destName: %v\n", destName)
-	destPath := filepath.Join(binPath, destName)
-	vprintf(1, "destPath: %v\n", destPath)
-	//if err := os.Rename(largestFile, destPath); err != nil {
-	//	return err
-	//}
-
-	// Read the file content
-	data, err := os.ReadFile(largestFile)
-	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
-	}
-	// Write to destination with executable permissions
-	err = os.WriteFile(destPath, data, 0755)
-	if err != nil {
-		return fmt.Errorf("failed to write file: %w", err)
-	}
-	// Remove the source file
-	err = os.Remove(largestFile)
-	if err != nil {
-		return fmt.Errorf("failed to remove temp file: %w", err)
-	}
-
-	pathmgr.CheckBinPath(binPath)
-
-	fmt.Printf("\nSuccessfully Installed: %s\n", destName)
-	return nil
-}
-
-var archAliases = map[string][]string{
-	"amd64": {"amd64", "x86_64", "x64"},
-	"arm64": {"arm64", "aarch64"},
+	return largestFile, nil
 }
 
 func filterAssets(assets []*github.ReleaseAsset, assetName, os, arch string) *github.ReleaseAsset {
