@@ -140,7 +140,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		_ = os.Remove(tmpFile.Name())
 	}()
 
-	vprintf(1, "tmpFile: %w", tmpFile.Name())
+	vprintf(1, "tmpFile: %v\n", tmpFile.Name())
 
 	// Write Download to File
 	_, err = io.Copy(tmpFile, rc)
