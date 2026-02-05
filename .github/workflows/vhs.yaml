@@ -1,0 +1,217 @@
+name: "VHS Tape"
+
+on:
+  workflow_dispatch:
+    inputs:
+      demo:
+        description: Demo Tape
+        type: boolean
+        default: false
+      banner:
+        description: Banner Tape
+        type: boolean
+        default: false
+      publish:
+        description: Publish Tapes
+        type: boolean
+        default: false
+
+env:
+  tape-dir: assets
+  image-dir: dist
+  bucket: cssnr
+  bucket-path: install-release
+
+jobs:
+  tapes:
+    name: "Tapes"
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Create Matrix"
+        id: matrix
+        shell: python
+        run: |
+          import json
+          import os
+          inputs="""
+          ${{ toJSON(inputs) }}
+          """
+          data = json.loads(inputs)
+          print(f"{data=}")
+          del data['publish']
+          print(f"{data=}")
+          keys = [k for k in data if data[k]]
+          print(f"{keys=}")
+          matrix_json = json.dumps(keys)
+          print(f"{matrix_json=}")
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            f.write(f"matrix={matrix_json}\n")
+
+      - name: "Debug Matrix"
+        continue-on-error: true
+        env:
+          matrix: ${{ steps.matrix.outputs.matrix }}
+        run: |
+          echo "${matrix}"
+
+  vhs:
+    name: "VHS ${{ matrix.tape }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: tapes
+    strategy:
+      fail-fast: false
+      matrix:
+        tape: ${{ fromJSON(needs.tapes.outputs.matrix) }}
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Debug event.json"
+        continue-on-error: true
+        run: cat "${GITHUB_EVENT_PATH}"
+      - name: "Debug CTX github"
+        continue-on-error: true
+        env:
+          GITHUB_CTX: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CTX"
+      - name: "Debug Environment"
+        continue-on-error: true
+        run: env
+
+      - name: "Debug Inputs"
+        #continue-on-error: true
+        run: |
+          echo github.repository: ${{ github.repository }}
+          echo github.event_name: ${{ github.event_name }}
+          echo github.ref_name: ${{ github.ref_name  }}
+
+          echo matrix.tape: ${{ matrix.tape }}
+
+          echo env.tape-dir: ${{ env.tape-dir }}
+          echo env.image-dir: ${{ env.image-dir }}
+          echo env.bucket: ${{ env.bucket }}
+          echo env.bucket-path: ${{ env.bucket-path }}
+
+          echo "tape=${{ env.tape-dir }}/${{ matrix.tape }}.tape" >> "$GITHUB_ENV"
+          echo "image=${{ env.image-dir }}/${{ matrix.tape }}.gif" >> "$GITHUB_ENV"
+          echo "target=${{ env.bucket-path }}/${{ matrix.tape }}.gif" >> "$GITHUB_ENV"
+
+      - name: "Verify Inputs"
+        #continue-on-error: true
+        run: |
+          echo "env.tape: ${{ env.tape }}"
+          echo "env.image: ${{ env.image }}"
+          echo "env.target: ${{ env.target }}"
+          [ -n "${{ env.tape }}" ]
+          [ -n "${{ env.image }}" ]
+          [ -n "${{ env.target }}" ]
+          mkdir -p "${{ env.tape-dir }}"
+          mkdir -p "${{ env.image-dir }}"
+          echo aws s3 cp "${{ env.image }}" "s3://${{ env.bucket }}/${{ env.target }}"
+
+      - name: "Install Release"
+        uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: smashedr/install-release
+
+      #- name: "Debug Release"
+      #  #continue-on-error: true
+      #  run: |
+      #    export PATH="${PATH}:${HOME}/bin"
+      #    echo "PATH: $PATH"
+      #    ir --version
+      #    ir info
+      #    ir smashedr/bup
+      #    which bup
+      #    bup -V
+
+      - name: "Install VHS"
+        uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: charmbracelet/vhs
+          binaries-location: vhs_0.10.0_Linux_x86_64
+
+      - name: "Install Dependencies"
+        id: install
+        run: |
+          echo "::group::install"
+          sudo apt update
+          sudo apt install -y ffmpeg ttyd
+          echo "::endgroup::"
+
+          ffmpeg -version
+          ttyd --version
+          vhs --version
+
+      - name: "Create VHS"
+        run: |
+          export PATH="${PATH}:${HOME}/bin"
+          vhs "${{ env.tape }}"
+
+      - name: "Debug VHS"
+        run: |
+          ls "${{ env.tape-dir }}"
+          file "${{ env.image }}"
+
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.tape }}
+          path: ${{ env.image }}
+
+      - name: "Discord Webhook"
+        continue-on-error: true
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          filename: ${{ env.image }}
+
+      - name: "Setup AWS"
+        if: ${{ inputs.publish }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_S3_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_S3_SECRET }}
+          aws-region: us-east-1
+
+      - name: "AWS S3 Upload"
+        if: ${{ inputs.publish }}
+        id: upload
+        run: |
+          aws s3 cp "${{ env.image }}" "s3://${{ env.bucket }}/${{ env.target }}"
+          url="https://${{ env.bucket }}.s3.amazonaws.com/${{ env.target }}"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: "Debug URL"
+        if: ${{ inputs.publish }}
+        continue-on-error: true
+        run: |
+          echo "url: ${{ steps.upload.outputs.url }}"
+
+      - name: "Job Summary"
+        continue-on-error: true
+        run: |
+          md="## VHS 📼 ${{ matrix.tape }}\n\n"
+          md+="<${{ steps.upload.outputs.url }}>\n\n"
+          md+="\`\`\`text\n${{ steps.upload.outputs.url }}\n\`\`\`\n\n"
+          md+="[![URL](${{ steps.upload.outputs.url }})](${{ steps.upload.outputs.url }})\n\n"
+          echo -e "${md}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: "Web Request"
+        if: ${{ inputs.publish }}
+        continue-on-error: true
+        uses: cssnr/web-request-action@v2
+        with:
+          url: ${{ secrets.DISCORD_WEBHOOK }}
+          data: |
+            content: "${{ steps.upload.outputs.url }}"
