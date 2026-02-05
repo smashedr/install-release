@@ -39,6 +39,11 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	destName, _ := cmd.Flags().GetString("name")
 	vprintf(1, "destName: %q\n", destName)
 
+	if len(args) < 1 {
+		_ = cmd.Help()
+		return fmt.Errorf("repository must be in format: owner/repo")
+	}
+
 	repository := args[0]
 	vprintf(1, "repository: %v\n", repository)
 	if !strings.Contains(repository, "/") {

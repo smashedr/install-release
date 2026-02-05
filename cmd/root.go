@@ -15,7 +15,6 @@ var rootCmd = &cobra.Command{
 	Use:          "install-release owner/repo [tag]",
 	Short:        "CLI to Install a GitHub Release",
 	Long:         "Easily Install GitHub Release binaries with Windows support.",
-	Args:         cobra.MinimumNArgs(1),
 	RunE:         runInstall,
 	SilenceUsage: true,
 }
