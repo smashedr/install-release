@@ -20,7 +20,7 @@ env:
   tape-dir: assets
   image-dir: dist
   bucket: cssnr
-  bucket-path: install-release
+  bucket-path: ${{ github.repository }}
 
 jobs:
   tapes:
@@ -122,7 +122,7 @@ jobs:
       - name: "Install Release"
         uses: jaxxstorm/action-install-gh-release@v1.10.0
         with:
-          repo: smashedr/install-release
+          repo: ${{ github.repository }}
 
       #- name: "Debug Release"
       #  #continue-on-error: true
