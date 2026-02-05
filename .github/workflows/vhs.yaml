@@ -199,6 +199,7 @@ jobs:
           echo "url: ${{ steps.upload.outputs.url }}"
 
       - name: "Job Summary"
+        if: ${{ inputs.publish }}
         continue-on-error: true
         run: |
           md="## VHS 📼 ${{ matrix.tape }}\n\n"

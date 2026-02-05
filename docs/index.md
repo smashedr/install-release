@@ -28,7 +28,7 @@ Easily Install GitHub Release binaries with Windows support.
 
 --8<-- "docs/snippets/install.md"
 
-[![VHS Tape](https://raw.githubusercontent.com/smashedr/repo-images/refs/heads/master/install-release/demo.gif)](#install)
+[![VHS Tape](https://cssnr.s3.amazonaws.com/install-release/demo.gif)](#install)
 
 ## :lucide-sparkles: Features
 

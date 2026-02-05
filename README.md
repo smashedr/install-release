@@ -33,7 +33,7 @@ CLI to Install a GitHub Release.
 
 Easily Install GitHub Release binaries with Windows support.
 
-[![VHS Tape](https://raw.githubusercontent.com/smashedr/repo-images/refs/heads/master/install-release/demo.gif)](https://smashedr.github.io/install-release/)
+[![VHS Tape](https://cssnr.s3.amazonaws.com/install-release/demo.gif)](https://smashedr.github.io/install-release/)
 
 > [!IMPORTANT]  
 > This project is in development.
