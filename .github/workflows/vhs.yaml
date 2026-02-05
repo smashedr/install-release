@@ -172,6 +172,10 @@ jobs:
           FORCE_COLOR: 1
         run: |
           export PATH="${PATH}:${HOME}/bin"
+          echo "::group::NAME"
+          env
+          echo "::endgroup::"
+          export COLORTERM=truecolor
           vhs "${{ env.tape }}"
 
       - name: "Debug VHS"
