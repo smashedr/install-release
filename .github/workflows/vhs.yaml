@@ -20,7 +20,7 @@ env:
   tape-dir: assets
   image-dir: dist
   bucket: cssnr
-  bucket-path: ${{ github.repository }}
+  bucket-path: install-release
 
 jobs:
   tapes:
