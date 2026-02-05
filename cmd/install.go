@@ -90,7 +90,8 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	} else {
 		result, found = findAssetByPlatform(release.Assets, runtime.GOOS, runtime.GOARCH)
 	}
-	fmt.Printf("result: %v\n", result)
+	vprintf(1, "result: %v\n", result)
+	vprintf(1, "found: %v\n", found)
 
 	if !found || !skipPrompts {
 		options := make([]huh.Option[int], len(release.Assets))
@@ -108,7 +109,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		}
 	}
 
-	fmt.Printf("result: %v\n", result)
+	vprintf(1, "result: %v\n", result)
 	asset = release.Assets[result]
 
 	if asset == nil {
