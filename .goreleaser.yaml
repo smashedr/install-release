@@ -35,15 +35,15 @@ archives:
 # https://goreleaser.com/customization/dockers_v2/
 dockers_v2:
   - images:
-      - "ghcr.io/smashedr/{{ .ProjectName }}"
+      - "ghcr.io/smashedr/install-release"
     tags:
       - "{{ if .Prerelease }}prerelease{{ else }}latest{{ end }}"
       - "{{ .Version }}"
     labels:
-      "org.opencontainers.image.description": "CLI to Install a GitHub Release"
+      "org.opencontainers.image.description": "{{ .Metadata.Description }}"
       "org.opencontainers.image.created": "{{ .Date }}"
-      "org.opencontainers.image.name": "{{ .ProjectName }}"
-      "org.opencontainers.image.title": "{{ .ProjectName }}"
+      "org.opencontainers.image.name": "install-release"
+      "org.opencontainers.image.title": "install-release"
       "org.opencontainers.image.revision": "{{ .FullCommit }}"
       "org.opencontainers.image.version": "{{ .Version }}"
       "org.opencontainers.image.source": "{{ .GitURL }}"
@@ -58,8 +58,8 @@ brews:
       token: "{{ .Env.GITHUB_TOKEN }}"
     skip_upload: true
     directory: Formula
-    homepage: "https://smashedr.github.io/{{ .ProjectName }}"
-    description: "CLI to Install a GitHub Release"
+    homepage: "https://smashedr.github.io/install-release"
+    description: "{{ .Metadata.Description }}"
     license: "MIT"
     install: |
       bin.install "ir"

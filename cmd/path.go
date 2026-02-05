@@ -26,18 +26,6 @@ var pathCmd = &cobra.Command{
 		binPath := viper.GetString("bin")
 		vprintf(1, "binPath: %v\n", binPath)
 
-		//var command string
-		//var path string
-		//if len(args) == 0 {
-		//	fmt.Printf("AI RETARDED!\n")
-		//	return
-		//} else if len(args) == 1 {
-		//	command = "check"
-		//	path = args[0]
-		//} else if len(args) == 2 {
-		//	command = strings.ToLower(args[0])
-		//	path = args[1]
-		//}
 		command := strings.ToLower(args[0])
 		path := args[1]
 		fmt.Printf("command: %s\n", command)

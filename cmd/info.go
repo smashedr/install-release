@@ -8,7 +8,7 @@ import (
 )
 
 var infoCmd = &cobra.Command{
-	Use:     "info [name]",
+	Use:     "info",
 	Aliases: []string{"i", "in", "inf"},
 	Short:   "Show application information",
 	Long:    "Show application information.",
@@ -18,6 +18,7 @@ var infoCmd = &cobra.Command{
 		fmt.Printf("binPath: %v\n", binPath)
 		fmt.Printf("ConfigFileUsed: %s\n", viper.ConfigFileUsed())
 		pathmgr.CheckBinPath(binPath)
+
 	},
 }
 

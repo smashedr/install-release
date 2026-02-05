@@ -16,7 +16,7 @@ tasks:
       prettier --check .
       yamllint -c .github/yamllint.yaml .
       golangci-lint run
-      actionlint
+      actionlint -shellcheck="-e SC2129"
 
   clean:
     desc: Clean All

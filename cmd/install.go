@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"github.com/bartventer/httpcache"
 	_ "github.com/bartventer/httpcache/store/fscache"
+	"github.com/charmbracelet/huh"
 	"github.com/google/go-github/v58/github"
-	"github.com/manifoldco/promptui"
 	"github.com/mholt/archives"
 	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"io"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -27,25 +28,16 @@ var archAliases = map[string][]string{
 }
 
 func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
+	var err error
 	vprintf(1, "args: %v\n", args)
 	binPath := viper.GetString("bin")
 	vprintf(1, "binPath: %v\n", binPath)
-
-	assetSelect, err := cmd.Flags().GetBool("select")
-	if err != nil {
-		return err
-	}
-	vprintf(1, "select flag: %v\n", assetSelect)
-	assetName, err := cmd.Flags().GetString("asset")
-	if err != nil {
-		return err
-	}
-	vprintf(1, "asset flag: %q\n", assetName)
-	destName, err := cmd.Flags().GetString("name")
-	if err != nil {
-		return err
-	}
-	vprintf(1, "name flag: %q\n", destName)
+	skipPrompts, _ := cmd.Flags().GetBool("yes")
+	vprintf(1, "skipPrompts: %v\n", skipPrompts)
+	assetName, _ := cmd.Flags().GetString("asset")
+	vprintf(1, "assetName: %q\n", assetName)
+	destName, _ := cmd.Flags().GetString("name")
+	vprintf(1, "destName: %q\n", destName)
 
 	repository := args[0]
 	vprintf(1, "repository: %v\n", repository)
@@ -90,43 +82,43 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	// Asset
 	var asset *github.ReleaseAsset
-	if !assetSelect {
-		asset = filterAssets(release.Assets, assetName, runtime.GOOS, runtime.GOARCH)
+	var result int
+	var found bool
+
+	if assetName != "" {
+		result, found = findAssetByName(release.Assets, assetName)
+	} else {
+		result, found = findAssetByPlatform(release.Assets, runtime.GOOS, runtime.GOARCH)
 	}
-	vprintf(2, "\nasset: %v\n\n", asset)
+	fmt.Printf("result: %v\n", result)
+
+	if !found || !skipPrompts {
+		options := make([]huh.Option[int], len(release.Assets))
+		for i, asset := range release.Assets {
+			options[i] = huh.NewOption(asset.GetName(), i)
+		}
+		form := huh.NewSelect[int]().
+			Title("Select a release asset:").
+			Options(options...).
+			Value(&result)
+
+		err = form.Run()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	fmt.Printf("result: %v\n", result)
+	asset = release.Assets[result]
 
 	if asset == nil {
-		var assetNames []string
-		for _, asset := range release.Assets {
-			assetNames = append(assetNames, *asset.Name)
-		}
-		vprintf(1, "assetNames: %v\n", assetNames)
-		prompt := promptui.Select{
-			Label: "Select Asset to Install",
-			Items: assetNames,
-		}
-		_, result, err := prompt.Run()
-		if err != nil {
-			return fmt.Errorf("prompt failed %w", err)
-		}
-		fmt.Printf("You choose: %q\n", result)
-
-		for i := range release.Assets {
-			if *release.Assets[i].Name == result {
-				asset = release.Assets[i]
-				break
-			}
-		}
-		if asset == nil {
-			return fmt.Errorf("no asset found")
-		}
-		vprintf(2, "\nasset: %v\n\n", asset)
+		return fmt.Errorf("no asset selected")
 	}
 
 	vprintf(1, "id: %v\n", asset.GetID())
 	fmt.Printf("url: %s\n", asset.GetBrowserDownloadURL())
 
-	// Download to Memory?
+	// Download to Memory
 	rc, _, err := client.Repositories.DownloadReleaseAsset(
 		ctx, owner, repo, asset.GetID(), httpClient,
 	)
@@ -304,26 +296,19 @@ func extractArchive(format archives.Format, stream io.Reader, tmpDir string) (st
 	return largestFile, nil
 }
 
-func filterAssets(assets []*github.ReleaseAsset, assetName, os, arch string) *github.ReleaseAsset {
-	if assetName != "" {
-		return findAssetByName(assets, assetName)
-	}
-	return findAssetByPlatform(assets, os, arch)
-}
-
-func findAssetByName(assets []*github.ReleaseAsset, assetName string) *github.ReleaseAsset {
+func findAssetByName(assets []*github.ReleaseAsset, assetName string) (int, bool) {
 	vprintf(1, "findAssetByName: %v\n", assetName)
 	assetName = strings.ToLower(assetName)
-	for _, asset := range assets {
+	for i, asset := range assets {
 		if strings.ToLower(asset.GetName()) == assetName {
 			vprintf(1, "matched: %v\n", asset.Name)
-			return asset
+			return i, true
 		}
 	}
-	return nil
+	return 0, false
 }
 
-func findAssetByPlatform(assets []*github.ReleaseAsset, os, arch string) *github.ReleaseAsset {
+func findAssetByPlatform(assets []*github.ReleaseAsset, os, arch string) (int, bool) {
 	vprintf(1, "findAssetByPlatform: %v - %v\n", os, arch)
 	aliases := archAliases[arch]
 	if aliases == nil {
@@ -331,17 +316,17 @@ func findAssetByPlatform(assets []*github.ReleaseAsset, os, arch string) *github
 	}
 	vprintf(1, "aliases: %v\n", aliases)
 
-	for _, asset := range assets {
+	for i, asset := range assets {
 		name := strings.ToLower(asset.GetName())
 		vprintf(2, "name: %v\n", name)
 		if strings.Contains(name, os) {
 			for _, arch := range aliases {
 				if strings.Contains(name, arch) {
-					vprintf(1, "matched: %v\n", asset.Name)
-					return asset
+					vprintf(1, "matched: %v\n", *asset.Name)
+					return i, true
 				}
 			}
 		}
 	}
-	return nil
+	return 0, false
 }
