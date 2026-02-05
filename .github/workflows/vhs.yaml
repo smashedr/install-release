@@ -129,10 +129,8 @@ jobs:
           export PATH="${PATH}:${HOME}/bin"
           go build
           stat install-release
-          chmod 0775 install-release
-          stat "${HOME}/bin" ||:
           mkdir -p "${HOME}/bin"
-          mv install-release "${HOME}/bin/ir"
+          mv -f install-release "${HOME}/bin/ir"
           which ir
           ir -V
 

@@ -14,6 +14,9 @@ Set Width 1200
 Set Height 720
 Set FontSize 34
 
+Env TERM "xterm-256color"
+Env COLORTERM "truecolor"
+Env FORCE_COLOR "1"
 
 Type "ir smashedr/bup"
 Sleep 0.5s
