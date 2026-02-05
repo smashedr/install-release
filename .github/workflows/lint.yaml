@@ -65,6 +65,8 @@ jobs:
       - name: "actionlint"
         if: ${{ !cancelled() }}
         uses: cssnr/actionlint-action@v1
+        with:
+          shellcheck_opts: -e SC2129
 
   golint:
     name: "GoLint - ${{ matrix.os }}"
