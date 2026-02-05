@@ -119,10 +119,22 @@ jobs:
           mkdir -p "${{ env.image-dir }}"
           echo aws s3 cp "${{ env.image }}" "s3://${{ env.bucket }}/${{ env.target }}"
 
-      - name: "Install Release"
-        uses: jaxxstorm/action-install-gh-release@v1.10.0
-        with:
-          repo: ${{ github.repository }}
+      #- name: "Install Release"
+      #  uses: jaxxstorm/action-install-gh-release@v1.10.0
+      #  with:
+      #    repo: ${{ github.repository }}
+
+      - name: "Go Build"
+        run: |
+          export PATH="${PATH}:${HOME}/bin"
+          go build
+          stat install-release
+          chmod 0775 install-release
+          stat "${HOME}/bin" ||:
+          mkdir -p "${HOME}/bin"
+          mv install-release "${HOME}/bin/ir"
+          which ir
+          ir -V
 
       #- name: "Debug Release"
       #  #continue-on-error: true
