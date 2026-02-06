@@ -135,8 +135,10 @@ jobs:
         #if: ${{ !inputs.publish }}
         run: |
           go build
+          stat install-release
           mkdir -p "${{ runner.temp }}/bin"
-          mv -f install-release "${{ runner.temp }}/ir"
+          mv install-release "${{ runner.temp }}/bin/ir"
+          file "${{ runner.temp }}/bin/ir"
           echo "${{ runner.temp }}/bin" >> "$GITHUB_PATH"
 
       - name: "Debug"
