@@ -170,7 +170,6 @@ jobs:
           CI: ""
           TERM: xterm-256color
           COLORTERM: truecolor
-          FORCE_COLOR: 1
         run: |
           export PATH="${PATH}:${HOME}/bin"
           vhs "${{ env.tape }}"
