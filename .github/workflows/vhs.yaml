@@ -167,16 +167,12 @@ jobs:
 
       - name: "Create VHS"
         env:
-          CI: ""
+          CI: 0
           TERM: xterm-256color
           COLORTERM: truecolor
           FORCE_COLOR: 1
         run: |
           export PATH="${PATH}:${HOME}/bin"
-          echo "::group::NAME"
-          env
-          echo "::endgroup::"
-          unset CI
           vhs "${{ env.tape }}"
 
       - name: "Debug VHS"
