@@ -22,7 +22,8 @@ import (
 )
 
 var archAliases = map[string][]string{
-	"amd64": {"amd64", "x86_64", "x64"},
+	"amd64": {"amd64", "x86_64", "win64", "x64"},
+	"386":   {"i386", "386", "win32", "x32"},
 	"arm64": {"arm64", "aarch64"},
 }
 
@@ -87,17 +88,15 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	// Asset
 	var asset *github.ReleaseAsset
 	var result int
-	var found bool
 
 	if assetName != "" {
-		result, found = findAssetByName(release.Assets, assetName)
+		result = findAssetByName(release.Assets, assetName)
 	} else {
-		result, found = findAssetByPlatform(release.Assets, runtime.GOOS, runtime.GOARCH)
+		result = findAssetByPlatform(release.Assets, runtime.GOOS, runtime.GOARCH)
 	}
 	vprintf(1, "result: %v\n", result)
-	vprintf(1, "found: %v\n", found)
 
-	if !found || !skipPrompts {
+	if result < 0 || !skipPrompts {
 		options := make([]huh.Option[int], len(release.Assets))
 		for i, asset := range release.Assets {
 			options[i] = huh.NewOption(asset.GetName(), i)
@@ -115,6 +114,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	vprintf(1, "result: %v\n", result)
 	asset = release.Assets[result]
+	vprintf(2, "asset: %v\n\n", asset)
 
 	if asset == nil {
 		return fmt.Errorf("no asset selected")
@@ -176,6 +176,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	if format != nil {
 		// Archive
 		binaryFilePath, err = extractArchive(format, stream, tmpDir)
+		vprintf(2, "1 binaryFilePath: %v\n", binaryFilePath)
 		if err != nil {
 			return err
 		}
@@ -185,12 +186,44 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	} else {
 		// Binary
 		binaryFilePath = tmpFile.Name()
+		vprintf(2, "2 binaryFilePath: %v\n", binaryFilePath)
 		if destName == "" {
-			destName = repo
+			destName = asset.GetName()
 		}
 	}
 	vprintf(1, "binaryFilePath: %v\n", binaryFilePath)
-	vprintf(1, "destName: %v\n", destName)
+	vprintf(1, "0 destName: %v\n", destName)
+
+	if before, _, found := strings.Cut(destName, "."); found {
+		destName = before
+	}
+	vprintf(1, "1 destName: %v\n", destName)
+	if runtime.GOOS == "windows" {
+		if !strings.HasSuffix(destName, ".exe") {
+			destName += ".exe"
+		}
+	}
+	vprintf(1, "2 destName: %v\n", destName)
+	if !skipPrompts {
+		form := huh.NewInput().
+			Title("Set Executable Name.").
+			Prompt("> ").
+			//Validate(isFood).
+			Validate(func(str string) error {
+				if str == "" {
+					//goland:noinspection ALL
+					return fmt.Errorf("Executable name can't be empty.") //nolint:staticcheck
+				}
+				return nil
+			}).
+			Value(&destName)
+		err = form.Run()
+		if err != nil {
+			fmt.Printf("Prompt failed %v\n", err)
+			os.Exit(1)
+		}
+		vprintf(1, "3 destName: %v\n", destName)
+	}
 
 	// Make sure it is executable
 	info, err := os.Stat(binaryFilePath)
@@ -301,19 +334,19 @@ func extractArchive(format archives.Format, stream io.Reader, tmpDir string) (st
 	return largestFile, nil
 }
 
-func findAssetByName(assets []*github.ReleaseAsset, assetName string) (int, bool) {
+func findAssetByName(assets []*github.ReleaseAsset, assetName string) int {
 	vprintf(1, "findAssetByName: %v\n", assetName)
 	assetName = strings.ToLower(assetName)
 	for i, asset := range assets {
 		if strings.ToLower(asset.GetName()) == assetName {
-			vprintf(1, "matched: %v\n", asset.Name)
-			return i, true
+			vprintf(1, "matched: %v\n", asset.GetName())
+			return i
 		}
 	}
-	return 0, false
+	return -1
 }
 
-func findAssetByPlatform(assets []*github.ReleaseAsset, os, arch string) (int, bool) {
+func findAssetByPlatform(assets []*github.ReleaseAsset, os, arch string) int {
 	vprintf(1, "findAssetByPlatform: %v - %v\n", os, arch)
 	aliases := archAliases[arch]
 	if aliases == nil {
@@ -321,17 +354,35 @@ func findAssetByPlatform(assets []*github.ReleaseAsset, os, arch string) (int, b
 	}
 	vprintf(1, "aliases: %v\n", aliases)
 
+	// Need more logic thanks to Darwin
+	//if os == "windows" {
+	//	os = "win"
+	//}
+
+	if i := findMatch(assets, os, aliases); i >= 0 {
+		return i
+	}
+	if arch == "amd64" && os == "windows" {
+		if i := findMatch(assets, os, archAliases["386"]); i >= 0 {
+			return i
+		}
+	}
+	return -1
+}
+
+func findMatch(assets []*github.ReleaseAsset, os string, aliases []string) int {
+	vprintf(1, "findMatch - aliases: %v\n", aliases)
 	for i, asset := range assets {
 		name := strings.ToLower(asset.GetName())
-		vprintf(2, "name: %v\n", name)
+		vprintf(3, "name: %v\n", name)
 		if strings.Contains(name, os) {
 			for _, arch := range aliases {
 				if strings.Contains(name, arch) {
-					vprintf(1, "matched: %v\n", *asset.Name)
-					return i, true
+					vprintf(1, "matched: %v\n", asset.GetName())
+					return i
 				}
 			}
 		}
 	}
-	return 0, false
+	return -1
 }

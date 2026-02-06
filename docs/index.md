@@ -34,14 +34,13 @@ Easily Install GitHub Release binaries with Windows support.
 
 - Supports Windows
 - Custom `bin` Path
-- Custom Executable Name
+- Automatic Release Detection
+- Select Asset and Name Interactively
+- Set Asset and Name Programmatically
 
 ## :lucide-plane-takeoff: Install
 
 --8<-- "docs/snippets/install.md"
-
-Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).  
-Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
 
 ## :lucide-terminal: Usage
 
@@ -55,6 +54,24 @@ Install a specific version.
 
 ```shell
 ir owner/repo v4.2.0
+```
+
+Skip the asset and name prompts.
+
+```shell
+ir owner/repo -y
+```
+
+Set the name and asset programmatically.
+
+```shell
+ir owner/repo -n name -a name_asset.zip
+```
+
+Install to a different bin directory.
+
+```shell
+ir owner/repo -b /usr/local/bin
 ```
 
 &nbsp;
