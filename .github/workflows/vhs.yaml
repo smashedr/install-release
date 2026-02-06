@@ -125,27 +125,29 @@ jobs:
       #  with:
       #    repo: ${{ github.repository }}
 
+      - name: "Setup Go"
+        #if: ${{ !inputs.publish }}
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
       - name: "Go Build"
         #if: ${{ !inputs.publish }}
         run: |
-          export PATH="${PATH}:${HOME}/bin"
           go build
-          stat install-release
-          mkdir -p "${HOME}/bin"
-          mv -f install-release "${HOME}/bin/ir"
-          which ir
-          ir -V
+          mkdir -p "${{ runner.temp }}/bin"
+          mv -f install-release "${{ runner.temp }}/ir"
+          echo "${{ runner.temp }}/bin" >> "$GITHUB_PATH"
 
-      #- name: "Debug Release"
-      #  #continue-on-error: true
-      #  run: |
-      #    export PATH="${PATH}:${HOME}/bin"
-      #    echo "PATH: $PATH"
-      #    ir --version
-      #    ir info
-      #    ir smashedr/bup
-      #    which bup
-      #    bup -V
+      - name: "Debug"
+        #if: ${{ !inputs.publish }}
+        run: |
+          echo "::group::PATH"
+          echo "$PATH"
+          echo "::endgroup::"
+          which ir
+          ir --version
+          ir info
 
       - name: "Install VHS"
         uses: jaxxstorm/action-install-gh-release@v1.10.0
@@ -171,7 +173,6 @@ jobs:
           TERM: xterm-256color
           COLORTERM: truecolor
         run: |
-          export PATH="${PATH}:${HOME}/bin"
           vhs "${{ env.tape }}"
 
       - name: "Debug VHS"
