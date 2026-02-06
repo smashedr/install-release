@@ -150,6 +150,7 @@ jobs:
           which ir
           ir --version
           ir info
+          echo "${HOME}/bin" >> "$GITHUB_PATH"
 
       - name: "Install VHS"
         uses: jaxxstorm/action-install-gh-release@v1.10.0
