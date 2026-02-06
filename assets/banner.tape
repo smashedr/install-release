@@ -16,7 +16,6 @@ Set FontSize 24
 
 Env TERM "xterm-256color"
 Env COLORTERM "truecolor"
-Env FORCE_COLOR "1"
 
 Hide
 Type "ir --help | head -n 16 && echo '  ...'"
