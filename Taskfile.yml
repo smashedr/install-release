@@ -56,12 +56,10 @@ tasks:
   vhs:
     desc: Create VHS Tape
     vars:
-      TAPE_FILE: '{{.CLI_ARGS | default "demo.tape"}}'
+      TAPE_FILE: '{{.CLI_ARGS | default "demo"}}'
     cmds:
-      - echo "Creating Tape - {{.TAPE_FILE}}"
-      - cp -f "assets/{{.TAPE_FILE}}" "{{.TAPE_FILE}}"
-      - vhs "{{.TAPE_FILE}}"
-      - defer: rm -f "{{.TAPE_FILE}}"
+      - echo "Creating Tape - assets/{{.TAPE_FILE}}.tape"
+      - vhs "assets/{{.TAPE_FILE}}.tape"
 
   test:
     if: test ! -d dist/PathMgr
