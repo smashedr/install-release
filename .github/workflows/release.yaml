@@ -195,7 +195,7 @@ jobs:
     if: ${{ always() }}
     runs-on: Ubuntu-latest
     timeout-minutes: 5
-    needs: [release]
+    needs: [build, windows, release]
 
     permissions:
       contents: write
