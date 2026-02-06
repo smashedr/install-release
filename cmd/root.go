@@ -15,7 +15,7 @@ var rootCmd = &cobra.Command{
 	Use:          "install-release owner/repo [tag]",
 	Short:        "CLI to Install a GitHub Release",
 	Long:         "Easily Install GitHub Release binaries with Windows support.",
-	Args:         cobra.MinimumNArgs(1),
+	Args:         cobra.ArbitraryArgs,
 	RunE:         runInstall,
 	SilenceUsage: true,
 }
@@ -33,15 +33,13 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.Flags().BoolP("version", "V", false, "show installed version")
-	rootCmd.Flags().BoolP("select", "s", false, "select from a list of assets")
 	rootCmd.Flags().StringP("asset", "a", "", "asset name to download")
 	rootCmd.Flags().StringP("name", "n", "", "binary file name to use")
+	rootCmd.Flags().BoolP("yes", "y", false, "answer yes to prompts")
 	rootCmd.Flags().StringP("bin", "b", "", "bin path to use")
 	_ = viper.BindPFlag("bin", rootCmd.Flags().Lookup("bin"))
-
-	//rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	rootCmd.PersistentFlags().CountVarP(&verbose, "verbose", "v", "verbose output (-vvv debug)")
+	rootCmd.Flags().BoolP("version", "V", false, "show installed version")
 }
 
 func initConfig() {

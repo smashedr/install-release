@@ -3,8 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/manifoldco/promptui"
 	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,35 +31,7 @@ var testCmd = &cobra.Command{
 		fmt.Println(info.Render(fmt.Sprintf("binPath: %v", binPath)))
 		fmt.Println(info.Render(fmt.Sprintf("ConfigFileUsed: %s", viper.ConfigFileUsed())))
 
-		//fmt.Printf("--------------------\n")
-		//fmt.Printf(info.Render(fmt.Sprintf("args: %v\n", args)))
-		//binPath := viper.GetString("bin")
-		//fmt.Printf(info.Render("binPath: %v\n", binPath))
-		//fmt.Printf(info.Render("ConfigFileUsed: %s\n", viper.ConfigFileUsed()))
-		//fmt.Printf(info.Render("--------------------\n"))
-
-		//fmt.Println(info.Render("Hello, kitty"))
-		//return
-
 		pathmgr.CheckBinPath(binPath)
-
-		//validate := func(input string) error {
-		//	_, err := strconv.ParseFloat(input, 64)
-		//	if err != nil {
-		//		return errors.New("invalid number")
-		//	}
-		//	return nil
-		//}
-		//prompt := promptui.Prompt{
-		//	Label:    "Number",
-		//	Validate: validate,
-		//}
-		//result, err := prompt.Run()
-		//if err != nil {
-		//	fmt.Printf("Prompt failed %v\n", err)
-		//	return
-		//}
-		//fmt.Printf("You choose %q\n", result)
 
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
@@ -69,18 +41,27 @@ var testCmd = &cobra.Command{
 		fmt.Printf("items %v\n", items)
 		items = append(items, "Enter Custom Path")
 		fmt.Printf("items %v\n", items)
-		prompt := promptui.Select{
-			Label: "Select Bin Directory",
-			Items: items,
+
+		var result string
+		options := make([]huh.Option[string], len(items))
+		for i, item := range items {
+			options[i] = huh.NewOption(item, item)
 		}
-		_, result, err := prompt.Run()
+
+		form := huh.NewSelect[string]().
+			Title("Select bin Path.").
+			Options(options...).
+			Value(&result)
+
+		err = form.Run()
 		if err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
 			return
 		}
 		fmt.Printf("You choose %q\n", result)
 
-		if result == "Enter Bin Directory" {
+		// TODO: Update to use huh
+		if result == "Enter Custom Path" {
 			newPath := promptPath()
 			fmt.Printf("newPath %q\n", newPath)
 		}
@@ -102,7 +83,6 @@ func promptPath() string {
 			}
 			input = filepath.Join(homeDir, input[1:])
 		}
-
 		info, err := os.Stat(input)
 		if err != nil {
 			if os.IsNotExist(err) {
@@ -115,11 +95,14 @@ func promptPath() string {
 		}
 		return nil
 	}
-	prompt := promptui.Prompt{
-		Label:    "Bin Directory Path",
-		Validate: validate,
-	}
-	result, err := prompt.Run()
+
+	var result string
+	form := huh.NewInput().
+		Title("Enter Full bin Path.").
+		Prompt("> ").
+		Validate(validate).
+		Value(&result)
+	err := form.Run()
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return ""

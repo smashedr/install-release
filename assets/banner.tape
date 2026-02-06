@@ -14,6 +14,8 @@ Set Width 1280
 Set Height 640
 Set FontSize 24
 
+Env TERM "xterm-256color"
+Env COLORTERM "truecolor"
 
 Hide
 Type "ir --help | head -n 16 && echo '  ...'"
@@ -21,11 +23,27 @@ Enter
 Show
 Sleep 1.5s
 
+Type "clear"
+Sleep 0.3s
+Enter
+
 Type "ir smashedr/bup"
 Sleep 0.5s
 Enter
+
+Wait / bup_/
+Sleep 1.5s
+Up
+Sleep 0.2s
+Up
+Sleep 0.5s
+Down
+Sleep 0.2s
+Down
+Sleep 0.5s
+Enter
 Wait
-Sleep 2s
+Sleep 1.5s
 
 Type "which bup"
 Sleep 0.5s

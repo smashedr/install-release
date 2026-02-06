@@ -20,24 +20,17 @@ var pathCmd = &cobra.Command{
 	Short:   "Manage the PATH",
 	Long:    "Manage the PATH.",
 	//Args:  cobra.MinimumNArgs(1),
-	Args: cobra.ExactArgs(2),
+	//Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		vprintf(1, "args: %s\n", args)
 		binPath := viper.GetString("bin")
 		vprintf(1, "binPath: %v\n", binPath)
 
-		//var command string
-		//var path string
-		//if len(args) == 0 {
-		//	fmt.Printf("AI RETARDED!\n")
-		//	return
-		//} else if len(args) == 1 {
-		//	command = "check"
-		//	path = args[0]
-		//} else if len(args) == 2 {
-		//	command = strings.ToLower(args[0])
-		//	path = args[1]
-		//}
+		if len(args) < 2 {
+			_ = cmd.Help()
+			return
+		}
+
 		command := strings.ToLower(args[0])
 		path := args[1]
 		fmt.Printf("command: %s\n", command)
