@@ -40,7 +40,7 @@ dockers_v2:
       - "{{ if .Prerelease }}prerelease{{ else }}latest{{ end }}"
       - "{{ .Version }}"
     labels:
-      "org.opencontainers.image.description": "{{ .Metadata.Description }}"
+      "org.opencontainers.image.description": "CLI to Install a GitHub Release"
       "org.opencontainers.image.created": "{{ .Date }}"
       "org.opencontainers.image.name": "install-release"
       "org.opencontainers.image.title": "install-release"
@@ -59,7 +59,7 @@ brews:
     skip_upload: true
     directory: Formula
     homepage: "https://smashedr.github.io/install-release"
-    description: "{{ .Metadata.Description }}"
+    description: "CLI to Install a GitHub Release"
     license: "MIT"
     install: |
       bin.install "ir"
