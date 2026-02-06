@@ -167,6 +167,7 @@ jobs:
 
       - name: "Create VHS"
         env:
+          CI: ""
           TERM: xterm-256color
           COLORTERM: truecolor
           FORCE_COLOR: 1
@@ -175,7 +176,7 @@ jobs:
           echo "::group::NAME"
           env
           echo "::endgroup::"
-          export COLORTERM=truecolor
+          unset CI
           vhs "${{ env.tape }}"
 
       - name: "Debug VHS"
