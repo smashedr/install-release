@@ -86,6 +86,24 @@ Install a specific version.
 ir owner/repo v4.2.0
 ```
 
+Skip the asset and name prompts.
+
+```shell
+ir owner/repo -y
+```
+
+Set the name and asset programmatically.
+
+```shell
+ir owner/repo -n name -a name_asset.zip
+```
+
+Install to a different bin directory.
+
+```shell
+ir owner/repo -b /usr/local/bin
+```
+
 [![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
 
 # Development
