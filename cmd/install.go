@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/viper"
 	"io"
 	"io/fs"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -110,7 +109,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 		err = form.Run()
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("prompt failed: %w", err)
 		}
 	}
 
