@@ -104,6 +104,18 @@ Install to a different bin directory.
 ir owner/repo -b /usr/local/bin
 ```
 
+List installed apps.
+
+```shell
+ir list
+```
+
+Remove an app.
+
+```shell
+ir remove name
+```
+
 [![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
 
 # Development

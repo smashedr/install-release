@@ -60,7 +60,6 @@ var testCmd = &cobra.Command{
 		}
 		fmt.Printf("You choose %q\n", result)
 
-		// TODO: Update to use huh
 		if result == "Enter Custom Path" {
 			newPath := promptPath()
 			fmt.Printf("newPath %q\n", newPath)

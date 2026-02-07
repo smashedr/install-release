@@ -74,6 +74,18 @@ Install to a different bin directory.
 ir owner/repo -b /usr/local/bin
 ```
 
+List installed apps.
+
+```shell
+ir list
+```
+
+Remove an app.
+
+```shell
+ir remove name
+```
+
 &nbsp;
 
 !!! question
