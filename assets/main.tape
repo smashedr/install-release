@@ -45,6 +45,18 @@ Enter
 Wait
 Sleep 2s
 
+Type "ir rm bup"
+Sleep 0.5s
+Enter
+Wait /Remove\!/
+Sleep 1.5s
+Right
+Sleep 0.4s
+Left
+Sleep 0.4s
+Enter
+Sleep 1.5s
+
 Type "clear"
 Sleep 0.3s
 Enter

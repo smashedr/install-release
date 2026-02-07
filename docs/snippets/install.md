@@ -23,7 +23,7 @@
 === "docker"
 
     ```shell
-    docker run --rm -v ~/bin:/out ghcr.io/smashedr/ir:latest --bin=/out owner/repo  # (1)!
+    docker run --rm -v ~/bin:/out ghcr.io/smashedr/ir:latest -b /out owner/repo  # (1)!
     ```
 
     1. _Note: Docker requires you to mount your bin directory and specify the path._

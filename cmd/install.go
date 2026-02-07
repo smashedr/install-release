@@ -221,8 +221,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 			Value(&destName)
 		err = form.Run()
 		if err != nil {
-			fmt.Printf("Prompt failed %v\n", err)
-			os.Exit(1)
+			log.Fatalf("Prompt failed %v", err)
 		}
 		log.Infof("3 destName: %v", destName)
 	}
