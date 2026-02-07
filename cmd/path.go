@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/charmbracelet/log"
 	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -22,9 +23,8 @@ var pathCmd = &cobra.Command{
 	//Args:  cobra.MinimumNArgs(1),
 	//Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		vprintf(1, "args: %s\n", args)
 		binPath := viper.GetString("bin")
-		vprintf(1, "binPath: %v\n", binPath)
+		log.Debug("pathCmd:", "args", args, "binPath", binPath)
 
 		if len(args) < 2 {
 			_ = cmd.Help()
@@ -43,7 +43,7 @@ var pathCmd = &cobra.Command{
 			fmt.Printf("ret: %v\n", ret)
 			fmt.Printf("err: %v\n", err)
 		case "r", "re", "rem", "remove":
-			fmt.Printf("INOP!\n")
+			log.Fatal("INOP: The remove command is not yet functional...")
 		case "c", "ch", "chk", "check":
 			found, findType, err := pathmgr.IsDirInPath(path)
 			fmt.Printf("--------------------\n")
