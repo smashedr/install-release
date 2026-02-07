@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -12,12 +12,13 @@ import (
 var verbose int
 
 var rootCmd = &cobra.Command{
-	Use:          "install-release owner/repo [tag]",
-	Short:        "CLI to Install a GitHub Release",
-	Long:         "Easily Install GitHub Release binaries with Windows support.",
-	Args:         cobra.ArbitraryArgs,
-	RunE:         runInstall,
-	SilenceUsage: true,
+	Use:     "ir owner/repo [tag]",
+	Short:   "CLI to Install a GitHub Release",
+	Long:    "Easily Install GitHub Release binaries with Windows support.",
+	Example: "  ir smashedr/bup\n  ir list",
+	Args:    cobra.ArbitraryArgs,
+	RunE:    runInstall,
+	//SilenceUsage: true, // set in runInstall for subcommands
 }
 
 func SetVersionInfo(version, commit, date string) {
@@ -32,7 +33,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(onInitialize)
 	rootCmd.Flags().StringP("asset", "a", "", "asset name to download")
 	rootCmd.Flags().StringP("name", "n", "", "binary file name to use")
 	rootCmd.Flags().BoolP("yes", "y", false, "answer yes to prompts")
@@ -42,7 +43,10 @@ func init() {
 	rootCmd.Flags().BoolP("version", "V", false, "show installed version")
 }
 
-func initConfig() {
+func onInitialize() {
+	initLogger(verbose)
+	log.Info("Log Level", "verbose", verbose)
+
 	//viper.SetEnvPrefix("ir")
 	viper.SetConfigType("yaml")
 	configName := "install-release"
@@ -56,35 +60,51 @@ func initConfig() {
 	viper.AddConfigPath("$HOME/Library/Application Support")
 
 	homeDir, err := os.UserHomeDir()
-	vprintf(2, "homeDir: %s\n", homeDir)
+	log.Debugf("homeDir: %v", homeDir)
 	if err != nil {
 		homeDir = "." // fallback to retarded AI
 	}
 	defaultBinPath := filepath.Join(homeDir, "bin")
-	vprintf(2, "defaultBinPath: %s\n", defaultBinPath)
+	log.Debugf("defaultBinPath: %v", defaultBinPath)
 	viper.SetDefault("bin", defaultBinPath)
 
 	if err := viper.ReadInConfig(); err != nil {
-		vprintf(2, "viper.ConfigFileUsed: %s\n", viper.ConfigFileUsed())
+		log.Debugf("viper.ConfigFileUsed: %v", viper.ConfigFileUsed())
 		configPath := filepath.Join(homeDir, ".config")
-		vprintf(2, "configPath: %s\n", configPath)
+		log.Debugf("configPath: %v", configPath)
 		_ = os.MkdirAll(configPath, 0755)
 		configFile := filepath.Join(configPath, configName+".yaml")
-		vprintf(2, "configFile: %s\n", configFile)
+		log.Infof("Config File: %v", configFile)
 		viper.SetConfigFile(configFile)
 		_ = viper.SafeWriteConfigAs(configFile)
 		if err := viper.ReadInConfig(); err != nil {
-			fmt.Printf("Error reading config: %s\nUsing Default Config!", configFile)
+			fmt.Printf("Error reading config: %sUsing Default Config!", configFile)
 		}
-		vprintf(1, "Config File: %s\n", configFile)
 	} else {
-		vprintf(1, "Config File: %s\n", viper.ConfigFileUsed())
+		log.Infof("Config File: %v", viper.ConfigFileUsed())
 	}
 
 	binPath := viper.GetString("bin")
-	vprintf(1, "binPath: %v\n", binPath)
-	vprintf(1, "--------------------\n")
+	log.Infof("Bin Path: %v", binPath)
 	if err = os.MkdirAll(binPath, 0755); err != nil {
 		log.Fatal("Error creating bin directory!")
+	}
+}
+
+func initLogger(verbosity int) {
+	log.SetReportCaller(verbosity >= 3)
+	log.SetReportTimestamp(verbosity >= 3)
+	log.SetTimeFormat("15:04:05")
+	//log.SetPrefix("ir")
+
+	switch verbosity {
+	case 0:
+		log.SetLevel(log.WarnLevel) // Default
+	case 1:
+		log.SetLevel(log.InfoLevel) // -v
+	case 2:
+		log.SetLevel(log.DebugLevel) // -vv
+	default:
+		log.SetLevel(log.DebugLevel) // -vvv+
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/bartventer/httpcache"
 	_ "github.com/bartventer/httpcache/store/fscache"
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/log"
 	"github.com/google/go-github/v58/github"
 	"github.com/mholt/archives"
 	"github.com/smashedr/install-release/internal/pathmgr"
@@ -28,16 +29,14 @@ var archAliases = map[string][]string{
 }
 
 func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
+	cmd.SilenceUsage = true // set here so subcommands do not silence usage
 	var err error
-	vprintf(1, "args: %v\n", args)
 	binPath := viper.GetString("bin")
-	vprintf(1, "binPath: %v\n", binPath)
+	log.Debug("runInstall:", "args", args, "binPath", binPath)
 	skipPrompts, _ := cmd.Flags().GetBool("yes")
-	vprintf(1, "skipPrompts: %v\n", skipPrompts)
 	assetName, _ := cmd.Flags().GetString("asset")
-	vprintf(1, "assetName: %q\n", assetName)
 	destName, _ := cmd.Flags().GetString("name")
-	vprintf(1, "destName: %q\n", destName)
+	log.Info("Flags:", "skipPrompts", skipPrompts, "assetName", assetName, "destName", destName)
 
 	if len(args) < 1 {
 		_ = cmd.Help()
@@ -45,7 +44,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	}
 
 	repository := args[0]
-	vprintf(1, "repository: %v\n", repository)
+	log.Infof("repository: %v", repository)
 	if !strings.Contains(repository, "/") {
 		return fmt.Errorf("repository must be in format: owner/repo")
 	}
@@ -58,10 +57,10 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	if len(args) > 1 {
 		tag = args[1]
 	}
-	fmt.Printf("Installing: %s/%s/%s\n", owner, repo, tag)
+	fmt.Printf("Processing: %s/%s:%s\n", owner, repo, tag)
 
-	vprintf(1, "GOOS: %v\n", runtime.GOOS)
-	vprintf(1, "GOARCH: %v\n", runtime.GOARCH)
+	log.Info("GOOS", "runtime.GOOS", runtime.GOOS)
+	log.Info("GOARCH", "runtime.GOARCH", runtime.GOARCH)
 
 	// Cache
 	dsn := "fscache://?appname=install-release"
@@ -82,8 +81,11 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	if err != nil {
 		return fmt.Errorf("get release error: %w", err)
 	}
-	vprintf(3, "release: %v\n\n", release)
-	vprintf(3, "release.Assets: %v\n\n", release.Assets)
+	if verbose >= 3 {
+		log.Debugf("release: %v\n", release)
+	}
+
+	fmt.Printf("Installing Version: %s\n", release.GetTagName())
 
 	// Asset
 	var asset *github.ReleaseAsset
@@ -94,7 +96,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	} else {
 		result = findAssetByPlatform(release.Assets, runtime.GOOS, runtime.GOARCH)
 	}
-	vprintf(1, "result: %v\n", result)
+	log.Debugf("result: %v", result)
 
 	if result < 0 || !skipPrompts {
 		options := make([]huh.Option[int], len(release.Assets))
@@ -112,15 +114,15 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		}
 	}
 
-	vprintf(1, "result: %v\n", result)
+	log.Debugf("result: %v", result)
 	asset = release.Assets[result]
-	vprintf(2, "asset: %v\n\n", asset)
+	log.Debugf("asset: %v\n", asset)
 
 	if asset == nil {
 		return fmt.Errorf("no asset selected")
 	}
 
-	vprintf(1, "id: %v\n", asset.GetID())
+	log.Infof("id: %v", asset.GetID())
 	fmt.Printf("url: %s\n", asset.GetBrowserDownloadURL())
 
 	// Download to Memory
@@ -142,7 +144,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		_ = os.Remove(tmpFile.Name())
 	}()
 
-	vprintf(1, "tmpFile: %v\n", tmpFile.Name())
+	log.Infof("tmpFile: %v", tmpFile.Name())
 
 	// Write Download to File
 	_, err = io.Copy(tmpFile, rc)
@@ -159,9 +161,9 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	// Identify Archive Format
 	format, stream, err := archives.Identify(context.Background(), tmpFile.Name(), tmpFile)
 	if err != nil {
-		vprintf(1, "identify Format error: %v\n", err)
+		log.Infof("identify Format error: %v", err)
 	}
-	vprintf(2, "format: %v\n", format)
+	log.Debugf("format: %v", format)
 
 	// Create Temp Directory for Archive Extraction
 	tmpDir, err := os.MkdirTemp("", "archive-extract-*")
@@ -169,14 +171,14 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		return err
 	}
 	defer func() { _ = os.RemoveAll(tmpDir) }()
-	vprintf(1, "tmpDir: %v\n", tmpDir)
+	log.Infof("tmpDir: %v", tmpDir)
 
 	// Check format set binaryFilePath and destName
 	var binaryFilePath string
 	if format != nil {
 		// Archive
 		binaryFilePath, err = extractArchive(format, stream, tmpDir)
-		vprintf(2, "1 binaryFilePath: %v\n", binaryFilePath)
+		log.Debugf("1 binaryFilePath: %v", binaryFilePath)
 		if err != nil {
 			return err
 		}
@@ -186,24 +188,24 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	} else {
 		// Binary
 		binaryFilePath = tmpFile.Name()
-		vprintf(2, "2 binaryFilePath: %v\n", binaryFilePath)
+		log.Debugf("2 binaryFilePath: %v", binaryFilePath)
 		if destName == "" {
 			destName = asset.GetName()
 		}
 	}
-	vprintf(1, "binaryFilePath: %v\n", binaryFilePath)
-	vprintf(1, "0 destName: %v\n", destName)
+	log.Infof("binaryFilePath: %v", binaryFilePath)
+	log.Infof("0 destName: %v", destName)
 
 	if before, _, found := strings.Cut(destName, "."); found {
 		destName = before
 	}
-	vprintf(1, "1 destName: %v\n", destName)
+	log.Infof("1 destName: %v", destName)
 	if runtime.GOOS == "windows" {
 		if !strings.HasSuffix(destName, ".exe") {
 			destName += ".exe"
 		}
 	}
-	vprintf(1, "2 destName: %v\n", destName)
+	log.Infof("2 destName: %v", destName)
 	if !skipPrompts {
 		form := huh.NewInput().
 			Title("Set Executable Name.").
@@ -222,7 +224,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 			fmt.Printf("Prompt failed %v\n", err)
 			os.Exit(1)
 		}
-		vprintf(1, "3 destName: %v\n", destName)
+		log.Infof("3 destName: %v", destName)
 	}
 
 	// Make sure it is executable
@@ -237,7 +239,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	// Move it to binPath
 	destPath := filepath.Join(binPath, destName)
-	vprintf(1, "destPath: %v\n", destPath)
+	log.Infof("destPath: %v", destPath)
 	// os.Rename does NOT work across volumes
 	//if err := os.Rename(binaryFilePath, destPath); err != nil {
 	//	return err
@@ -326,20 +328,20 @@ func extractArchive(format archives.Format, stream io.Reader, tmpDir string) (st
 		return "", err
 	}
 
-	vprintf(1, "largestFile: %v\n", largestFile)
+	log.Infof("largestFile: %v", largestFile)
 	if largestFile == "" {
 		return largestFile, fmt.Errorf("no files found in tmpDir")
 	}
-	vprintf(1, "largestSize: %v\n", largestSize)
+	log.Infof("largestSize: %v", largestSize)
 	return largestFile, nil
 }
 
 func findAssetByName(assets []*github.ReleaseAsset, assetName string) int {
-	vprintf(1, "findAssetByName: %v\n", assetName)
+	log.Infof("findAssetByName: %v", assetName)
 	assetName = strings.ToLower(assetName)
 	for i, asset := range assets {
 		if strings.ToLower(asset.GetName()) == assetName {
-			vprintf(1, "matched: %v\n", asset.GetName())
+			log.Infof("matched: %v", asset.GetName())
 			return i
 		}
 	}
@@ -347,12 +349,12 @@ func findAssetByName(assets []*github.ReleaseAsset, assetName string) int {
 }
 
 func findAssetByPlatform(assets []*github.ReleaseAsset, os, arch string) int {
-	vprintf(1, "findAssetByPlatform: %v - %v\n", os, arch)
+	log.Infof("findAssetByPlatform: %v - %v", os, arch)
 	aliases := archAliases[arch]
 	if aliases == nil {
 		aliases = []string{arch}
 	}
-	vprintf(1, "aliases: %v\n", aliases)
+	log.Infof("aliases: %v", aliases)
 
 	// Need more logic thanks to Darwin
 	//if os == "windows" {
@@ -371,14 +373,16 @@ func findAssetByPlatform(assets []*github.ReleaseAsset, os, arch string) int {
 }
 
 func findMatch(assets []*github.ReleaseAsset, os string, aliases []string) int {
-	vprintf(1, "findMatch - aliases: %v\n", aliases)
+	log.Infof("findMatch - aliases: %v", aliases)
 	for i, asset := range assets {
 		name := strings.ToLower(asset.GetName())
-		vprintf(3, "name: %v\n", name)
+		if verbose >= 3 {
+			log.Debugf("name: %v", name)
+		}
 		if strings.Contains(name, os) {
 			for _, arch := range aliases {
 				if strings.Contains(name, arch) {
-					vprintf(1, "matched: %v\n", asset.GetName())
+					log.Infof("matched: %v", asset.GetName())
 					return i
 				}
 			}
