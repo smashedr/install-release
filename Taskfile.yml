@@ -15,8 +15,8 @@ tasks:
     cmd: |
       prettier --check .
       yamllint -c .github/yamllint.yaml .
-      golangci-lint run
       actionlint -shellcheck="-e SC2129"
+      golangci-lint run
 
   clean:
     desc: Clean All
@@ -57,9 +57,17 @@ tasks:
     desc: Create VHS Tape
     vars:
       TAPE_FILE: '{{.CLI_ARGS | default "demo"}}'
-    cmds:
-      - echo "Creating Tape - assets/{{.TAPE_FILE}}.tape"
-      - vhs "assets/{{.TAPE_FILE}}.tape"
+    cmd: |
+      echo "Creating Tape - assets/{{.TAPE_FILE}}.tape"
+      vhs "assets/{{.TAPE_FILE}}.tape"
+
+  install:
+    platforms: [linux, darwin]
+    cmd: |
+      go build
+      sudo mv install-release /usr/local/bin/ir
+      which ir
+      ir -V
 
   test:
     if: test ! -d dist/PathMgr
