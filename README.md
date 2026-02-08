@@ -31,7 +31,7 @@
 
 CLI to Install a GitHub Release.
 
-Easily Install GitHub Release binaries with Windows support.
+Easily Install GitHub Release binaries with Windows, Linux and macOS Support.
 
 [![VHS Tape](https://cssnr.s3.amazonaws.com/install-release/demo.gif)](https://smashedr.github.io/install-release/)
 
@@ -44,7 +44,7 @@ Easily Install GitHub Release binaries with Windows support.
 #### Homebrew
 
 ```shell
-brew install smashedr/test/install-release
+brew install cssnr/tap/install-release
 ```
 
 #### GitHub

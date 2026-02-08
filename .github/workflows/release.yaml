@@ -6,8 +6,8 @@ on:
 
 env:
   formula: install-release.rb
-  tap-owner: smashedr
-  tap-repo: homebrew-test
+  tap-owner: cssnr
+  tap-repo: homebrew-tap
 
 jobs:
   build:
@@ -117,6 +117,19 @@ jobs:
       - name: "Debug Artifacts"
         run: |
           ls -Recurse dist
+
+      - name: "Set Installer Version"
+        if: ${{ github.event_name == 'release' }}
+        continue-on-error: true
+        run: |
+          $string = "BackUP Installer"
+          $file = "assets\pre-install.rtf"
+          $content = Get-Content -Path $file -Raw
+          $content = $content -replace $string, "$string v${{ github.ref_name }}"
+          Set-Content -Path $file -Value $content -NoNewline
+          Write-Output "::group::Content"
+          Write-Output $content
+          Write-Output "::endgroup::"
 
       - name: "Inno Setup"
         run: |
