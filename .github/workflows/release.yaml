@@ -118,6 +118,19 @@ jobs:
         run: |
           ls -Recurse dist
 
+      - name: "Set Installer Version"
+        if: ${{ github.event_name == 'release' }}
+        continue-on-error: true
+        run: |
+          $string = "BackUP Installer"
+          $file = "assets\pre-install.rtf"
+          $content = Get-Content -Path $file -Raw
+          $content = $content -replace $string, "$string v${{ github.ref_name }}"
+          Set-Content -Path $file -Value $content -NoNewline
+          Write-Output "::group::Content"
+          Write-Output $content
+          Write-Output "::endgroup::"
+
       - name: "Inno Setup"
         run: |
           echo "Building Version: ${{ github.ref_name }}"
@@ -215,7 +228,7 @@ jobs:
         run: |
           echo -e "\n## Cleanup Release\n\n" >> "$GITHUB_STEP_SUMMARY"
           echo -e "Deleting Release and Tag: \`${{ github.ref_name }}\`\n\n" >> "$GITHUB_STEP_SUMMARY"
-          if gh release delete "${{ github.ref_name }}" --repo "${{ github.repository }}" --cleanup-tag;then
+          if gh release delete "${{ github.ref_name }}" --cleanup-tag;then
             echo -e "✅ Cleanup Success.\n" >> "$GITHUB_STEP_SUMMARY"
           else
             echo -e "⛔ Cleanup Failed!\n" >> "$GITHUB_STEP_SUMMARY"

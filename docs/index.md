@@ -15,7 +15,7 @@ icon: lucide/rocket
 [![GitHub Top Language](https://img.shields.io/github/languages/top/smashedr/install-release?logo=devbox)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
 [![GitHub Contributors](https://img.shields.io/github/contributors-anon/smashedr/install-release?logo=southwestairlines)](https://github.com/smashedr/install-release/graphs/contributors)
 [![GitHub Issues](https://img.shields.io/github/issues/smashedr/install-release?logo=codeforces&logoColor=white)](https://github.com/smashedr/install-release/issues)
-[![GitHub Discussions](https://img.shields.io/github/discussions/smashedr/install-release?logo=rocketdotchat&logoColor=white)](https://github.com/smashedr/install-release/discussions)
+[![GitHub Discussions](https://img.shields.io/github/discussions/smashedr/install-release?logo=theconversation&logoColor=white)](https://github.com/smashedr/install-release/discussions)
 [![GitHub Forks](https://img.shields.io/github/forks/smashedr/install-release?style=flat&logo=forgejo&logoColor=white)](https://github.com/smashedr/install-release/forks)
 [![GitHub Repo Stars](https://img.shields.io/github/stars/smashedr/install-release?style=flat&logo=gleam&logoColor=white)](https://github.com/smashedr/install-release/stargazers)
 [![GitHub Org Stars](https://img.shields.io/github/stars/cssnr?style=flat&logo=apachespark&logoColor=white&label=org%20stars)](https://cssnr.github.io/)
@@ -24,11 +24,17 @@ icon: lucide/rocket
 
 CLI to Install a GitHub Release.
 
-Easily Install GitHub Release binaries with Windows support.
+Easily Install GitHub Release binaries with Windows, Linux and macOS Support.
 
 --8<-- "docs/snippets/install.md"
 
+If you run into any issues or have any questions, [support](support.md) is available.
+
+## :lucide-terminal: Demo
+
 [![VHS Tape](https://cssnr.s3.amazonaws.com/install-release/demo.gif)](#install)
+
+:lucide-videotape: This demo was generated with [charmbracelet/vhs](https://github.com/charmbracelet/vhs).
 
 ## :lucide-sparkles: Features
 
@@ -37,10 +43,13 @@ Easily Install GitHub Release binaries with Windows support.
 - Automatic Release Detection
 - Select Asset and Name Interactively
 - Set Asset and Name Programmatically
+- List and Remove Installed Apps
 
 ## :lucide-plane-takeoff: Install
 
 --8<-- "docs/snippets/install.md"
+
+[![Latest Release](https://img.shields.io/github/v/release/smashedr/install-release?style=for-the-badge&logo=github&label=latest%20version)](https://github.com/smashedr/install-release/releases/latest)
 
 ## :lucide-terminal: Usage
 

@@ -63,7 +63,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	log.Info("GOARCH", "runtime.GOARCH", runtime.GOARCH)
 
 	// Cache
-	dsn := "fscache://?appname=install-release"
+	dsn := "fscache://?appname=install-release&maxsize=10485760"
 	httpClient := &http.Client{
 		Transport: httpcache.NewTransport(dsn, httpcache.WithSWRTimeout(10*time.Second)),
 	}
@@ -125,9 +125,8 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	log.Infof("id: %v", asset.GetID())
 	fmt.Printf("url: %s\n", asset.GetBrowserDownloadURL())
 
-	// Download to Memory
 	rc, _, err := client.Repositories.DownloadReleaseAsset(
-		ctx, owner, repo, asset.GetID(), httpClient,
+		ctx, owner, repo, asset.GetID(), http.DefaultClient,
 	)
 	if err != nil {
 		return err
