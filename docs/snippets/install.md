@@ -4,7 +4,7 @@
     brew install cssnr/tap/install-release
     ```
 
-=== ":simple-go: source"
+=== ":simple-github: github"
 
     ```shell
     curl https://i.jpillora.com/smashedr/install-release! | bash  # (1)!
