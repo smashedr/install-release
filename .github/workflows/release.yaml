@@ -228,7 +228,7 @@ jobs:
         run: |
           echo -e "\n## Cleanup Release\n\n" >> "$GITHUB_STEP_SUMMARY"
           echo -e "Deleting Release and Tag: \`${{ github.ref_name }}\`\n\n" >> "$GITHUB_STEP_SUMMARY"
-          if gh release delete "${{ github.ref_name }}" --cleanup-tag;then
+          if gh release delete "${{ github.ref_name }}" --repo "${{ github.repository }}" --cleanup-tag;then
             echo -e "✅ Cleanup Success.\n" >> "$GITHUB_STEP_SUMMARY"
           else
             echo -e "⛔ Cleanup Failed!\n" >> "$GITHUB_STEP_SUMMARY"
