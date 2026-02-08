@@ -44,7 +44,7 @@ Easily Install GitHub Release binaries with Windows, Linux and macOS Support.
 #### Homebrew
 
 ```shell
-brew install smashedr/test/install-release
+brew install cssnr/tap/install-release
 ```
 
 #### GitHub

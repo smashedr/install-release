@@ -1,7 +1,7 @@
 === ":simple-homebrew: brew"
 
     ```shell
-    brew install smashedr/test/install-release
+    brew install cssnr/tap/install-release
     ```
 
 === ":simple-go: source"

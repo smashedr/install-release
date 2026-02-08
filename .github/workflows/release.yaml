@@ -6,8 +6,8 @@ on:
 
 env:
   formula: install-release.rb
-  tap-owner: smashedr
-  tap-repo: homebrew-test
+  tap-owner: cssnr
+  tap-repo: homebrew-tap
 
 jobs:
   build:
