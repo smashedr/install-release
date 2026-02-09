@@ -65,10 +65,10 @@ go install github.com/smashedr/install-release@latest
 #### Docker
 
 ```shell
-docker run --rm -v ~/bin:/out ghcr.io/smashedr/ir:latest -b /out owner/repo
+docker run --rm -it -v ~/bin:/out ghcr.io/smashedr/ir:latest -b /out smashedr/install-release
 ```
 
-_Note: Docker requires you to mount your bin directory and specify the path._
+_Note: Docker requires you to mount the target bin directory and specify the path._
 
 [![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
 

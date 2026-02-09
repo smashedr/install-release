@@ -23,10 +23,10 @@
 === ":simple-docker: docker"
 
     ```shell
-    docker run --rm -v ~/bin:/out ghcr.io/smashedr/ir:latest -b /out owner/repo  # (1)!
+    docker run --rm -it -v ~/bin:/out ghcr.io/smashedr/ir:latest -b /out smashedr/install-release  # (1)!
     ```
 
-    1. _Note: Docker requires you to mount your bin directory and specify the path._
+    1. _Note: Docker requires you to mount the target bin directory and specify the path._
 
 :fontawesome-brands-windows: Windows users can download the [Windows&nbsp;Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).  
 :lucide-download: Alternatively, you can manually [download&nbsp;a&nbsp;release](https://github.com/smashedr/install-release/releases).
