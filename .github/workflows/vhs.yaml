@@ -6,11 +6,11 @@ on:
       demo:
         description: Demo Tape
         type: boolean
-        default: false
+        default: true
       banner:
         description: Banner Tape
         type: boolean
-        default: false
+        default: true
       publish:
         description: Publish Tapes
         type: boolean
@@ -124,6 +124,9 @@ jobs:
       #  uses: jaxxstorm/action-install-gh-release@v1.10.0
       #  with:
       #    repo: ${{ github.repository }}
+
+      #- name: "Install App Dependencies"
+      #  run: sudo apt-get update && sudo apt-get install -y libx11-dev xvfb
 
       - name: "Setup Go"
         #if: ${{ !inputs.publish }}

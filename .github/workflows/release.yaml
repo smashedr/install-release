@@ -122,7 +122,7 @@ jobs:
         if: ${{ github.event_name == 'release' }}
         continue-on-error: true
         run: |
-          $string = "BackUP Installer"
+          $string = "Install Release Installer"
           $file = "assets\pre-install.rtf"
           $content = Get-Content -Path $file -Raw
           $content = $content -replace $string, "$string v${{ github.ref_name }}"

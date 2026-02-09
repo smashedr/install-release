@@ -51,7 +51,7 @@ If you run into any issues or have any questions, [support](support.md) is avail
 
 [![Latest Release](https://img.shields.io/github/v/release/smashedr/install-release?style=for-the-badge&logo=github&label=latest%20version)](https://github.com/smashedr/install-release/releases/latest)
 
-## :lucide-terminal: Usage
+## :lucide-terminal-square: Usage
 
 Install the latest release.
 

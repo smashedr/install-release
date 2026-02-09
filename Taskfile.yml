@@ -15,8 +15,8 @@ tasks:
     cmd: |
       prettier --check .
       yamllint -c .github/yamllint.yaml .
-      actionlint -shellcheck="-e SC2129"
       golangci-lint run
+      actionlint -shellcheck="-e SC2129"
 
   clean:
     desc: Clean All
@@ -41,25 +41,16 @@ tasks:
   inno:
     aliases: [setup]
     desc: Inno Setup
+    deps: [pathmgr]
     cmd: iscc.exe installer.iss
 
   pathmgr:
-    preconditions:
-      - sh: test ! -d dist/PathMgr
-        msg: "Already downloaded to: dist/PathMgr"
     desc: Download PathMgr
+    if: test ! -d dist/PathMgr
     cmd: |
       mkdir -p dist
       wget https://github.com/Bill-Stewart/PathMgr/releases/download/v2.0.0/PathMgr-2.0.0.zip -O dist/pathmgr.zip
       unzip dist/pathmgr.zip -d dist/PathMgr
-
-  vhs:
-    desc: Create VHS Tape
-    vars:
-      TAPE_FILE: '{{.CLI_ARGS | default "demo"}}'
-    cmd: |
-      echo "Creating Tape - assets/{{.TAPE_FILE}}.tape"
-      vhs "assets/{{.TAPE_FILE}}.tape"
 
   install:
     platforms: [linux, darwin]
@@ -69,11 +60,10 @@ tasks:
       which ir
       ir -V
 
-  test:
-    if: test ! -d dist/PathMgr
-    #preconditions:
-    #  - sh: test ! -d dist/PathMgr
-    #    msg: "Already downloaded to: dist/PathMgr"
-    desc: Test Command
+  vhs:
+    desc: Create VHS Tape
+    vars:
+      TAPE_FILE: '{{.CLI_ARGS | default "demo"}}'
     cmd: |
-      echo "Taskfile.yaml test Successful (no test was run)..."
+      echo "Creating Tape - assets/{{.TAPE_FILE}}.tape"
+      vhs "assets/{{.TAPE_FILE}}.tape"
