@@ -60,10 +60,10 @@ tasks:
       which ir
       ir -V
 
-  vhs:
+  vhs:*:
     desc: Create VHS Tape
     vars:
-      TAPE_FILE: '{{.CLI_ARGS | default "demo"}}'
+      TAPE_FILE: '{{index .MATCH 0 | default "demo"}}'
     cmd: |
       echo "Creating Tape - assets/{{.TAPE_FILE}}.tape"
       vhs "assets/{{.TAPE_FILE}}.tape"
