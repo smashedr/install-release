@@ -78,6 +78,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	} else {
 		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
 	}
+	//release, err := getRelease(client, owner, repo, tag)
 	if err != nil {
 		return fmt.Errorf("get release error: %w", err)
 	}
@@ -238,19 +239,18 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	// Move it to binPath
 	destPath := filepath.Join(binPath, destName)
 	log.Infof("destPath: %v", destPath)
-	// os.Rename does NOT work across volumes
-	//if err := os.Rename(binaryFilePath, destPath); err != nil {
-	//	return err
-	//}
-	// Read the file content
-	data, err := os.ReadFile(binaryFilePath)
-	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
-	}
-	// Write to destination with executable permissions
-	err = os.WriteFile(destPath, data, 0755)
-	if err != nil {
-		return fmt.Errorf("failed to write file: %w", err)
+	if err := os.Rename(binaryFilePath, destPath); err != nil {
+		log.Infof("os.Rename failed (copying): %v", err)
+		// Read the file content
+		data, err := os.ReadFile(binaryFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to read file: %w", err)
+		}
+		// Write to destination with executable permissions
+		err = os.WriteFile(destPath, data, 0755)
+		if err != nil {
+			return fmt.Errorf("failed to write file: %w", err)
+		}
 	}
 
 	// WIP
@@ -388,3 +388,18 @@ func findMatch(assets []*github.ReleaseAsset, os string, aliases []string) int {
 	}
 	return -1
 }
+
+//func getRelease(client *github.Client, owner, repo, tag string) (*github.RepositoryRelease, error) {
+//	ctx := context.Background()
+//	var release *github.RepositoryRelease
+//	var err error
+//	if tag == "latest" {
+//		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
+//	} else {
+//		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
+//	}
+//	if err != nil {
+//		return nil, fmt.Errorf("get release error: %w", err)
+//	}
+//	return release, nil
+//}
