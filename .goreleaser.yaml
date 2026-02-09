@@ -56,6 +56,7 @@ brews:
 # https://goreleaser.com/customization/dockers_v2/
 dockers_v2:
   - images:
+      - "ghcr.io/smashedr/install-release"
       - "ghcr.io/smashedr/ir"
     tags:
       - "{{ if .Prerelease }}prerelease{{ else }}latest{{ end }}"
