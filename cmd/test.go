@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/log"
 	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -13,23 +13,16 @@ import (
 	"strings"
 )
 
-var info = lipgloss.NewStyle().
-	Bold(true).
-	Foreground(lipgloss.Color("#FAFAFA")).
-	Background(lipgloss.Color("#7D56F4")).
-	//Align(lipgloss.Center).
-	Width(80)
-
 var testCmd = &cobra.Command{
 	Use:     "test",
-	Aliases: []string{"t", "te", "tes"},
+	Aliases: []string{"t"},
 	Short:   "Test command",
 	Long:    "Test command.",
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := viper.GetString("bin")
-		fmt.Println(info.Render(fmt.Sprintf("args: %v", args)))
-		fmt.Println(info.Render(fmt.Sprintf("binPath: %v", binPath)))
-		fmt.Println(info.Render(fmt.Sprintf("ConfigFileUsed: %s", viper.ConfigFileUsed())))
+		log.Debug("testCmd:", "args", args, "binPath", binPath)
+
+		log.Warnf("This is only a test and does nothing...")
 
 		pathmgr.CheckBinPath(binPath)
 

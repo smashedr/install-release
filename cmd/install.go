@@ -10,6 +10,7 @@ import (
 	"github.com/google/go-github/v58/github"
 	"github.com/mholt/archives"
 	"github.com/smashedr/install-release/internal/pathmgr"
+	"github.com/smashedr/install-release/internal/styles"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"io"
@@ -57,7 +58,8 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	if len(args) > 1 {
 		tag = args[1]
 	}
-	fmt.Printf("Processing: %s/%s:%s\n", owner, repo, tag)
+	//fmt.Printf("Processing: %s/%s:%s\n", owner, repo, tag)
+	styles.PrintKV("Repository:", fmt.Sprintf("%s/%s:%s", owner, repo, tag))
 
 	log.Info("GOOS", "runtime.GOOS", runtime.GOOS)
 	log.Info("GOARCH", "runtime.GOARCH", runtime.GOARCH)
@@ -78,14 +80,16 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	} else {
 		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
 	}
+	//release, err := getRelease(client, owner, repo, tag)
 	if err != nil {
 		return fmt.Errorf("get release error: %w", err)
 	}
 	if verbose >= 3 {
-		log.Debugf("release: %v\n", release)
+		log.Debugf("release: %v", release)
 	}
 
-	fmt.Printf("Installing Version: %s\n", release.GetTagName())
+	//fmt.Printf("Installing Version: %s\n", release.GetTagName())
+	styles.PrintKV("Version:", release.GetTagName())
 
 	// Asset
 	var asset *github.ReleaseAsset
@@ -116,14 +120,16 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	log.Debugf("result: %v", result)
 	asset = release.Assets[result]
-	log.Debugf("asset: %v\n", asset)
+	log.Debugf("asset: %v", asset)
 
 	if asset == nil {
 		return fmt.Errorf("no asset selected")
 	}
 
 	log.Infof("id: %v", asset.GetID())
-	fmt.Printf("url: %s\n", asset.GetBrowserDownloadURL())
+	//fmt.Printf("url: %s\n", asset.GetBrowserDownloadURL())
+	log.Infof("url: %v", asset.GetBrowserDownloadURL())
+	styles.PrintKV("Asset Name:", asset.GetName())
 
 	rc, _, err := client.Repositories.DownloadReleaseAsset(
 		ctx, owner, repo, asset.GetID(), http.DefaultClient,
@@ -193,18 +199,18 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		}
 	}
 	log.Infof("binaryFilePath: %v", binaryFilePath)
-	log.Infof("0 destName: %v", destName)
+	log.Debugf("1 destName: %v", destName)
 
 	if before, _, found := strings.Cut(destName, "."); found {
 		destName = before
 	}
-	log.Infof("1 destName: %v", destName)
+	log.Debugf("2 destName: %v", destName)
 	if runtime.GOOS == "windows" {
 		if !strings.HasSuffix(destName, ".exe") {
 			destName += ".exe"
 		}
 	}
-	log.Infof("2 destName: %v", destName)
+	log.Debugf("3 destName: %v", destName)
 	if !skipPrompts {
 		form := huh.NewInput().
 			Title("Set Executable Name.").
@@ -222,7 +228,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		if err != nil {
 			log.Fatalf("Prompt failed %v", err)
 		}
-		log.Infof("3 destName: %v", destName)
+		log.Debugf("4 destName: %v", destName)
 	}
 
 	// Make sure it is executable
@@ -237,26 +243,26 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	// Move it to binPath
 	destPath := filepath.Join(binPath, destName)
-	log.Infof("destPath: %v", destPath)
-	// os.Rename does NOT work across volumes
-	//if err := os.Rename(binaryFilePath, destPath); err != nil {
-	//	return err
-	//}
-	// Read the file content
-	data, err := os.ReadFile(binaryFilePath)
-	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
-	}
-	// Write to destination with executable permissions
-	err = os.WriteFile(destPath, data, 0755)
-	if err != nil {
-		return fmt.Errorf("failed to write file: %w", err)
+	styles.PrintKV("Destination:", destPath)
+	if err := os.Rename(binaryFilePath, destPath); err != nil {
+		log.Infof("os.Rename failed (copying): %v", err)
+		// Read the file content
+		data, err := os.ReadFile(binaryFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to read file: %w", err)
+		}
+		// Write to destination with executable permissions
+		err = os.WriteFile(destPath, data, 0755)
+		if err != nil {
+			return fmt.Errorf("failed to write file: %w", err)
+		}
 	}
 
 	// WIP
 	pathmgr.CheckBinPath(binPath)
 
-	fmt.Printf("\nSuccessfully Installed: %s\n", destName)
+	//fmt.Printf("\nSuccessfully Installed: %s\n", destName)
+	styles.PrintKV("Installed:", destName)
 	return nil
 }
 
@@ -388,3 +394,18 @@ func findMatch(assets []*github.ReleaseAsset, os string, aliases []string) int {
 	}
 	return -1
 }
+
+//func getRelease(client *github.Client, owner, repo, tag string) (*github.RepositoryRelease, error) {
+//	ctx := context.Background()
+//	var release *github.RepositoryRelease
+//	var err error
+//	if tag == "latest" {
+//		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
+//	} else {
+//		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
+//	}
+//	if err != nil {
+//		return nil, fmt.Errorf("get release error: %w", err)
+//	}
+//	return release, nil
+//}

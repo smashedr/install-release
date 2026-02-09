@@ -53,10 +53,9 @@ tasks:
       unzip dist/pathmgr.zip -d dist/PathMgr
 
   install:
-    platforms: [linux, darwin]
     cmd: |
       go build
-      sudo mv install-release /usr/local/bin/ir
+      mv install-release "${HOME}/bin/ir"
       which ir
       ir -V
 
