@@ -5,6 +5,7 @@ package pathmgr
 import (
 	"errors"
 	"fmt"
+	"github.com/charmbracelet/log"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -13,10 +14,10 @@ import (
 
 func IsDirInPath(dirPath string) (found bool, pathType uint32, err error) {
 	var findType uint32
-	fmt.Printf("IsDirInPath: %v\n", dirPath)
+	log.Debugf("IsDirInPath: %v", dirPath)
 
 	dllPath, _ := getDLLPath()
-	fmt.Printf("dllPath: %v\n", dllPath)
+	log.Debugf("dllPath: %v", dllPath)
 	pathMgr := syscall.NewLazyDLL(dllPath)
 	isDirInPath := pathMgr.NewProc("IsDirInPath")
 
@@ -44,12 +45,12 @@ func IsDirInPath(dirPath string) (found bool, pathType uint32, err error) {
 }
 
 func AddDirToPath(dirPath string, pathType, addType int) (bool, int, error) {
-	fmt.Printf("AddDirToPath: %v\n", dirPath)
-	fmt.Printf("pathType: %v\n", pathType)
-	fmt.Printf("addType: %v\n", addType)
+	log.Infof("AddDirToPath: %v\n", dirPath)
+	log.Infof("pathType: %v\n", pathType)
+	log.Infof("addType: %v\n", addType)
 
 	dllPath, _ := getDLLPath()
-	fmt.Printf("dllPath: %v\n", dllPath)
+	log.Infof("dllPath: %v\n", dllPath)
 
 	pathMgr := syscall.MustLoadDLL(dllPath)
 	//defer func() { _ = pathMgr.Release() }()
@@ -66,7 +67,7 @@ func AddDirToPath(dirPath string, pathType, addType int) (bool, int, error) {
 		uintptr(addType),  // 0 end - 1 start
 	)
 	if err != nil {
-		fmt.Printf("err: %v\n", err)
+		log.Warnf("err: %v", err)
 	}
 	//fmt.Printf("ret: %v\n", ret)
 

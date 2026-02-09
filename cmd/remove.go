@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/log"
+	"github.com/smashedr/install-release/internal/styles"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -66,7 +67,7 @@ var removeCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("prompt error: %v", err)
 		}
-		fmt.Printf("Removed: %v\n", name)
+		styles.PrintKV("Removed:", name)
 	},
 }
 

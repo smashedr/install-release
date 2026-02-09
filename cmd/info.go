@@ -1,11 +1,13 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/charmbracelet/log"
 	"github.com/smashedr/install-release/internal/pathmgr"
+	"github.com/smashedr/install-release/internal/styles"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
+	"path/filepath"
 )
 
 var infoCmd = &cobra.Command{
@@ -17,10 +19,20 @@ var infoCmd = &cobra.Command{
 		binPath := viper.GetString("bin")
 		log.Debug("infoCmd:", "args", args, "binPath", binPath)
 
-		fmt.Printf("Bin Path: %v\n", binPath)
-		fmt.Printf("Config File Used: %s\n", viper.ConfigFileUsed())
-
 		pathmgr.CheckBinPath(binPath)
+
+		exPath := "Unknown"
+		ex, err := os.Executable()
+		if err != nil {
+			log.Warn(err)
+		} else {
+			exPath = filepath.Dir(ex)
+		}
+
+		styles.PrintKV("Executable:", exPath)
+		styles.PrintKV("Config Used:", viper.ConfigFileUsed())
+		styles.PrintKV("Bin Path:", binPath)
+
 	},
 }
 

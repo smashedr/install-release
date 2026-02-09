@@ -1,15 +1,18 @@
 package pathmgr
 
-import "fmt"
+import (
+	"github.com/charmbracelet/log"
+)
 
 func CheckBinPath(binPath string) {
 	//fmt.Printf("CheckBinPath: %s\n", binPath)
 	result, _, _ := IsDirInPath(binPath)
 	//fmt.Printf("result: %v\n", result)
 	if !result {
-		fmt.Printf("Warning: bin directory not in PATH!\n")
-		fmt.Printf("To add to path run:\nir path add %s\n", binPath)
+		log.Warnf("bin not in PATH: %v", binPath)
+		// Add Lip Gloss Style...
+		log.Printf("To add to path run:\nir path add %s\n", binPath)
 	} else {
-		fmt.Printf("Found bin in PATH: %s\n", binPath)
+		log.Infof("Found bin in PATH: %s", binPath)
 	}
 }
