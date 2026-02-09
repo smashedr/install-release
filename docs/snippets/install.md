@@ -23,7 +23,7 @@
 === ":simple-docker: docker"
 
     ```shell
-    docker run --rm -it -v ~/bin:/out ghcr.io/smashedr/ir:latest -b /out smashedr/install-release  # (1)!
+    docker run --rm -itv ~/bin:/out ghcr.io/smashedr/ir:latest -b /out smashedr/install-release  # (1)!
     ```
 
     1. _Note: Docker requires you to mount the target bin directory and specify the path._
