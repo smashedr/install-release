@@ -3,14 +3,6 @@ name: "VHS Tape"
 on:
   workflow_dispatch:
     inputs:
-      demo:
-        description: Demo Tape
-        type: boolean
-        default: true
-      banner:
-        description: Banner Tape
-        type: boolean
-        default: true
       publish:
         description: Publish Tapes
         type: boolean
@@ -23,51 +15,14 @@ env:
   bucket-path: install-release
 
 jobs:
-  tapes:
-    name: "Tapes"
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v6
-
-      - name: "Create Matrix"
-        id: matrix
-        shell: python
-        run: |
-          import json
-          import os
-          inputs="""
-          ${{ toJSON(inputs) }}
-          """
-          data = json.loads(inputs)
-          print(f"{data=}")
-          del data['publish']
-          print(f"{data=}")
-          keys = [k for k in data if data[k]]
-          print(f"{keys=}")
-          matrix_json = json.dumps(keys)
-          print(f"{matrix_json=}")
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-            f.write(f"matrix={matrix_json}\n")
-
-      - name: "Debug Matrix"
-        continue-on-error: true
-        env:
-          matrix: ${{ steps.matrix.outputs.matrix }}
-        run: |
-          echo "${matrix}"
-
   vhs:
     name: "VHS ${{ matrix.tape }}"
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: tapes
     strategy:
       fail-fast: false
       matrix:
-        tape: ${{ fromJSON(needs.tapes.outputs.matrix) }}
+        tapes: [demo, banner]
 
     permissions:
       contents: read
@@ -88,8 +43,7 @@ jobs:
         continue-on-error: true
         run: env
 
-      - name: "Debug Inputs"
-        #continue-on-error: true
+      - name: "Set Inputs"
         run: |
           echo github.repository: ${{ github.repository }}
           echo github.event_name: ${{ github.event_name }}
@@ -103,21 +57,6 @@ jobs:
           echo env.bucket-path: ${{ env.bucket-path }}
 
           echo "tape=${{ env.tape-dir }}/${{ matrix.tape }}.tape" >> "$GITHUB_ENV"
-          echo "image=${{ env.image-dir }}/${{ matrix.tape }}.gif" >> "$GITHUB_ENV"
-          echo "target=${{ env.bucket-path }}/${{ matrix.tape }}.gif" >> "$GITHUB_ENV"
-
-      - name: "Verify Inputs"
-        #continue-on-error: true
-        run: |
-          echo "env.tape: ${{ env.tape }}"
-          echo "env.image: ${{ env.image }}"
-          echo "env.target: ${{ env.target }}"
-          [ -n "${{ env.tape }}" ]
-          [ -n "${{ env.image }}" ]
-          [ -n "${{ env.target }}" ]
-          mkdir -p "${{ env.tape-dir }}"
-          mkdir -p "${{ env.image-dir }}"
-          echo aws s3 cp "${{ env.image }}" "s3://${{ env.bucket }}/${{ env.target }}"
 
       #- name: "Install Release"
       #  if: ${{ inputs.publish }}
@@ -144,7 +83,7 @@ jobs:
           file "${{ runner.temp }}/bin/ir"
           echo "${{ runner.temp }}/bin" >> "$GITHUB_PATH"
 
-      - name: "Debug"
+      - name: "Set PATH"
         #if: ${{ !inputs.publish }}
         run: |
           echo "::group::PATH"
@@ -183,21 +122,20 @@ jobs:
 
       - name: "Debug VHS"
         run: |
-          ls "${{ env.tape-dir }}"
-          file "${{ env.image }}"
+          ls -lAhR "${{ env.image-dir }}"
 
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.tape }}
-          path: ${{ env.image }}
+          path: ${{ env.image-dir }}
 
-      - name: "Discord Webhook"
-        continue-on-error: true
-        uses: tsickert/discord-webhook@v7.0.0
-        with:
-          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-          filename: ${{ env.image }}
+      #- name: "Discord Webhook"
+      #  continue-on-error: true
+      #  uses: tsickert/discord-webhook@v7.0.0
+      #  with:
+      #    webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+      #    filename: ${{ env.image }}
 
       - name: "Setup AWS"
         if: ${{ inputs.publish }}
@@ -211,31 +149,54 @@ jobs:
         if: ${{ inputs.publish }}
         id: upload
         run: |
-          aws s3 cp "${{ env.image }}" "s3://${{ env.bucket }}/${{ env.target }}"
-          url="https://${{ env.bucket }}.s3.amazonaws.com/${{ env.target }}"
-          echo "url=$url" >> "$GITHUB_OUTPUT"
+          for image in "${{ image-dir }}"/*; do
+            echo "Checking: $image"
+            [ ! -f "$image" ] && continue
+            if [[ "$image" == *.apng ]]; then
+              new_image="${image%.apng}.png"
+              echo "Renaming: $image -> $new_image"
+              mv "$image" "$new_image"
+              image="$new_image"
+            fi
+            filename="$(basename "$image")"
 
-      - name: "Debug URL"
-        if: ${{ inputs.publish }}
-        continue-on-error: true
-        run: |
-          echo "url: ${{ steps.upload.outputs.url }}"
+            destination="${{ env.bucket-path }}/${filename}"
+            echo "Uploading: $image -> $destination"
+            echo aws s3 cp "$image" "s3://${{ env.bucket }}/$destination"
+            url="https://${{ env.bucket }}.s3.amazonaws.com/$destination"
+            echo "url: $url"
+            echo "$url" >> "${{ runner.temp }}/results.txt"
+          done
+          # Note: could make a matrix from the results...
+          echo "::group::results"
+          cat -n "${{ runner.temp }}/results.txt"
+          echo "::endgroup::"
+
+      #- name: "Debug URL"
+      #  if: ${{ inputs.publish }}
+      #  continue-on-error: true
+      #  run: |
+      #    echo "url: ${{ steps.upload.outputs.url }}"
 
       - name: "Job Summary"
         if: ${{ inputs.publish }}
         continue-on-error: true
         run: |
           md="## VHS 📼 ${{ matrix.tape }}\n\n"
-          md+="<${{ steps.upload.outputs.url }}>\n\n"
-          md+="\`\`\`text\n${{ steps.upload.outputs.url }}\n\`\`\`\n\n"
-          md+="[![URL](${{ steps.upload.outputs.url }})](${{ steps.upload.outputs.url }})\n\n"
+          while IFS= read -r url; do
+            echo "Processing url: $url"
+            md+="<${url}>\n\n"
+            md+="\`\`\`text\n${url}\n\`\`\`\n\n"
+            md+="[![URL](${url})](${url})\n\n"
+            md+="---\n\n"
+          done < "${{ runner.temp }}/results.txt"
           echo -e "${md}" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: "Web Request"
-        if: ${{ inputs.publish }}
-        continue-on-error: true
-        uses: cssnr/web-request-action@v2
-        with:
-          url: ${{ secrets.DISCORD_WEBHOOK }}
-          data: |
-            content: "${{ steps.upload.outputs.url }}"
+      #- name: "Web Request"
+      #  if: ${{ inputs.publish }}
+      #  continue-on-error: true
+      #  uses: cssnr/web-request-action@v2
+      #  with:
+      #    url: ${{ secrets.DISCORD_WEBHOOK }}
+      #    data: |
+      #      content: "${{ steps.upload.outputs.url }}"

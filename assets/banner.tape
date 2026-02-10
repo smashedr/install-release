@@ -1,4 +1,4 @@
-Output dist/banner.gif
+Output dist/banner.apng
 #Output dist/banner.mp4
 #Output dist/banner.webm
 

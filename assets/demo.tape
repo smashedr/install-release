@@ -1,5 +1,5 @@
 Output dist/demo.gif
-#Output dist/demo.mp4
+Output dist/demo.mp4
 #Output dist/demo.webm
 
 Require ir
