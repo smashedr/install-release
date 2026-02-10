@@ -4,15 +4,21 @@
     brew install cssnr/tap/install-release
     ```
 
-=== ":simple-github: github"
+=== ":lucide-terminal-square: bash"
 
     ```shell
     curl https://i.jpillora.com/smashedr/install-release! | bash  # (1)!
     ```
 
-    1.  Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).
+    1.  Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
 
-        Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
+=== ":lucide-terminal: powershell"
+
+    ```powershell
+    iex (iwr -useb 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.ps1').Content  # (1)!
+    ```
+
+    1.  Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).
 
 === ":simple-go: source"
 

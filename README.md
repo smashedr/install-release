@@ -47,14 +47,21 @@ Easily Install GitHub Release binaries with Windows, Linux and macOS Support.
 brew install cssnr/tap/install-release
 ```
 
-#### GitHub
+#### Bash
 
 ```shell
 curl https://i.jpillora.com/smashedr/install-release! | bash
 ```
 
-Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).  
 Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
+
+#### Powershell
+
+```powershell
+iex (iwr -useb 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.ps1').Content
+```
+
+Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).
 
 #### Source
 

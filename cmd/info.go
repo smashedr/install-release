@@ -51,6 +51,7 @@ var infoCmd = &cobra.Command{
 				{"Assets", strconv.Itoa(len(release.Assets))},
 			}
 			styles.RenderTable(rows, "Info", "Details")
+			return
 		}
 
 		pathmgr.CheckBinPath(binPath) // WIP
