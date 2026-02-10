@@ -24,6 +24,23 @@ var testCmd = &cobra.Command{
 
 		log.Warnf("This is only a test and does nothing...")
 
+		//// Enable Console on Windows (rendering a table does this)
+		//if runtime.GOOS == "windows" {
+		//	kernel32 := syscall.NewLazyDLL("kernel32.dll")
+		//	setConsoleMode := kernel32.NewProc("SetConsoleMode")
+		//	handle, _ := syscall.GetStdHandle(syscall.STD_OUTPUT_HANDLE)
+		//	_, _, _ = setConsoleMode.Call(uintptr(handle), 0x0001|0x0002|0x0004)
+		//}
+
+		//out, err := glamour.Render(result, "dracula")
+		//if err != nil {
+		//	log.Fatalf("Error rendering release notes: %v", err)
+		//}
+		//fmt.Print(strings.TrimLeft(out, "\n"))
+		//
+		//styles.PrintKV("Release URL:", release.GetHTMLURL())
+		//return
+
 		pathmgr.CheckBinPath(binPath) // WIP
 
 		homeDir, err := os.UserHomeDir()

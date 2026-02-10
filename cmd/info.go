@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/log"
 	"github.com/dustin/go-humanize"
 	"github.com/smashedr/install-release/internal/pathmgr"
@@ -21,16 +20,8 @@ var infoCmd = &cobra.Command{
 	Long:    "Show app or package information.",
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := viper.GetString("bin")
-		sumFlag, _ := cmd.Flags().GetBool("summary")
-		log.Debug("infoCmd:", "args", args, "binPath", binPath, "sumFlag", sumFlag)
-
-		//// Enable Console on Windows (rendering a table does this)
-		//if runtime.GOOS == "windows" {
-		//	kernel32 := syscall.NewLazyDLL("kernel32.dll")
-		//	setConsoleMode := kernel32.NewProc("SetConsoleMode")
-		//	handle, _ := syscall.GetStdHandle(syscall.STD_OUTPUT_HANDLE)
-		//	_, _, _ = setConsoleMode.Call(uintptr(handle), 0x0001|0x0002|0x0004)
-		//}
+		//sumFlag, _ := cmd.Flags().GetBool("summary")
+		log.Debug("infoCmd:", "args", args, "binPath", binPath)
 
 		if len(args) >= 1 && strings.Contains(args[0], "/") {
 			owner, repo, err := parseRepository(args[0])
@@ -60,28 +51,6 @@ var infoCmd = &cobra.Command{
 				{"Assets", strconv.Itoa(len(release.Assets))},
 			}
 			styles.RenderTable(rows, "Info", "Details")
-			if sumFlag {
-				return
-			}
-
-			//width, height, err := term.GetSize(os.Stdout.Fd())
-			//if err != nil {
-			//	log.Warn(err)
-			//	width = 80
-			//}
-			//log.Info("GetSize:", "width", width, "height", height)
-
-			// Add Pager
-			result := headString(release.GetBody(), 12)
-
-			out, err := glamour.Render(result, "dracula")
-			if err != nil {
-				log.Fatalf("Error rendering release notes: %v", err)
-			}
-			fmt.Print(strings.TrimLeft(out, "\n"))
-
-			styles.PrintKV("Release URL:", release.GetHTMLURL())
-			return
 		}
 
 		pathmgr.CheckBinPath(binPath) // WIP
@@ -103,5 +72,5 @@ var infoCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(infoCmd)
-	infoCmd.Flags().BoolP("summary", "s", false, "only show summary")
+	//infoCmd.Flags().BoolP("summary", "s", false, "only show summary")
 }
