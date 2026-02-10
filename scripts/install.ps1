@@ -14,6 +14,11 @@ $repository = "smashedr/install-release"
 Write-Host -ForegroundColor Cyan "Installing: $repository"
 
 ## ARCH
+
+if (-not (Test-Path variable:IsWindows)) {
+    $script:IsWindows = $true
+}
+
 $platform = switch ($true) {
     $IsWindows { "Windows" }
     $IsLinux   { "Linux" }
@@ -21,7 +26,7 @@ $platform = switch ($true) {
     default    { "unknown" }
 }
 Write-Host -ForegroundColor DarkCyan "platform: $platform"
-$osArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+$osArchitecture = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture
 Write-Host -ForegroundColor DarkCyan "osArchitecture: $osArchitecture"
 $arch = switch ($osArchitecture) {
     "X64"   { "x86_64" }
