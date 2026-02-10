@@ -66,4 +66,3 @@ tasks:
     cmd: |
       echo "Creating Tape - assets/{{.TAPE_FILE}}.tape"
       vhs "assets/{{.TAPE_FILE}}.tape"
-      mv "dist/{{.TAPE_FILE}}.apng" "dist/{{.TAPE_FILE}}.png" ||:
