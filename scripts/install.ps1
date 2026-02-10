@@ -11,9 +11,13 @@ $ErrorActionPreference = "Stop"
 $exeName = "ir"
 $repository = "smashedr/install-release"
 
-Write-Host -ForegroundColor Cyan "Installing: $repository"
+Write-Host -ForegroundColor Green "Installing: $repository"
 
 ## ARCH
+if (-not (Test-Path variable:IsWindows)) {
+    Write-Host -ForegroundColor DarkCyan "Windows Detected. Forcing IsWindows."
+    $script:IsWindows = $true
+}
 $platform = switch ($true) {
     $IsWindows { "Windows" }
     $IsLinux   { "Linux" }
@@ -21,7 +25,7 @@ $platform = switch ($true) {
     default    { "unknown" }
 }
 Write-Host -ForegroundColor DarkCyan "platform: $platform"
-$osArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+$osArchitecture = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture
 Write-Host -ForegroundColor DarkCyan "osArchitecture: $osArchitecture"
 $arch = switch ($osArchitecture) {
     "X64"   { "x86_64" }
@@ -33,9 +37,9 @@ Write-Host -ForegroundColor DarkCyan "arch: $arch"
 
 ## FILE
 if ($IsWindows) {
-    $exeName = "${exeName}.exe"
     $binPath = Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps"
     $file = "${exeName}_${platform}_${arch}.zip"
+    $exeName = "${exeName}.exe"
 } else {
     $binPath = Join-Path $HOME ".local/bin"
     $file = "${exeName}_${platform}_${arch}.tar.gz"
@@ -57,11 +61,11 @@ if ($bin) {
 
 if (-not (Test-Path -IsValid $binPath)) {
     Write-Host -ForegroundColor Red "Invalid path: $binPath"
-    exit 1
+    throw
 }
 if (-not (Test-Path $binPath)) {
     Write-Host -ForegroundColor Red "Directory does not exist: $binPath"
-    exit 1
+    throw
 }
 
 ## PATH
@@ -81,6 +85,7 @@ if ($IsWindows) {
     # Unix
     if ($env:PATH -split ':' -notcontains $binPath) {
         Write-Host -ForegroundColor Yellow "Adding PATH: $binPath"
+        Write-Host -ForegroundColor DarkCyan "Profile: $PROFILE"
         $env:PATH += [IO.Path]::PathSeparator + $binPath
         if (!(Test-Path -Path $PROFILE)) {
             New-Item -ItemType File -Path $PROFILE -Force | Out-Null
@@ -116,7 +121,7 @@ try {
     Move-Item -Path $source -Destination $binPath -Force
 } catch {
     Write-Host -ForegroundColor Red "Error: $_"
-    exit 1
+    throw
 } finally {
     if (Test-Path $tempDir) {
         Write-Host -ForegroundColor DarkCyan "Cleaning Up: $tempDir"
