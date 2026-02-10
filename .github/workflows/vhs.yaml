@@ -64,7 +64,6 @@ jobs:
           echo env.bucket-path: ${{ env.bucket-path }}
 
           echo inputs.publish: ${{ inputs.publish }}
-          echo inputs.continue-on-error: ${{ inputs.continue-on-error }}
 
           echo "tape=${{ env.tape-dir }}/${{ matrix.tape }}.tape" >> "$GITHUB_ENV"
 
