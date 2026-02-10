@@ -7,6 +7,16 @@ on:
         description: Publish Tapes
         type: boolean
         default: false
+  workflow_call:
+    inputs:
+      publish:
+        description: Publish Tapes
+        type: boolean
+        default: true
+      continue-on-error:
+        description: Continue on Error
+        type: boolean
+        default: true
 
 env:
   tape-dir: assets
@@ -19,6 +29,7 @@ jobs:
     name: "VHS ${{ matrix.tape }}"
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    continue-on-error: ${{ inputs.continue-on-error }}
     strategy:
       fail-fast: false
       matrix:
@@ -46,8 +57,8 @@ jobs:
       - name: "Set Inputs"
         run: |
           echo github.repository: ${{ github.repository }}
-          echo github.event_name: ${{ github.event_name }}
           echo github.ref_name: ${{ github.ref_name  }}
+          echo github.event_name: ${{ github.event_name }}
 
           echo matrix.tape: ${{ matrix.tape }}
 
@@ -56,25 +67,28 @@ jobs:
           echo env.bucket: ${{ env.bucket }}
           echo env.bucket-path: ${{ env.bucket-path }}
 
+          echo inputs.publish: ${{ inputs.publish }}
+          echo inputs.continue-on-error: ${{ inputs.continue-on-error }}
+
           echo "tape=${{ env.tape-dir }}/${{ matrix.tape }}.tape" >> "$GITHUB_ENV"
 
-      #- name: "Install Release"
-      #  if: ${{ inputs.publish }}
-      #  uses: jaxxstorm/action-install-gh-release@v1.10.0
-      #  with:
-      #    repo: ${{ github.repository }}
+      - name: "Install Release"
+        if: ${{ github.event_name == 'workflow_call' }}
+        uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: ${{ github.repository }}
 
       #- name: "Install App Dependencies"
       #  run: sudo apt-get update && sudo apt-get install -y libx11-dev xvfb
 
       - name: "Setup Go"
-        #if: ${{ !inputs.publish }}
+        if: ${{ github.event_name != 'workflow_call' }}
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
 
       - name: "Go Build"
-        #if: ${{ !inputs.publish }}
+        if: ${{ github.event_name != 'workflow_call' }}
         run: |
           go build
           stat install-release
@@ -84,7 +98,6 @@ jobs:
           echo "${{ runner.temp }}/bin" >> "$GITHUB_PATH"
 
       - name: "Set PATH"
-        #if: ${{ !inputs.publish }}
         run: |
           echo "::group::PATH"
           echo "$PATH"
@@ -134,13 +147,6 @@ jobs:
           name: ${{ matrix.tape }}
           path: ${{ env.image-dir }}
 
-      #- name: "Discord Webhook"
-      #  continue-on-error: true
-      #  uses: tsickert/discord-webhook@v7.0.0
-      #  with:
-      #    webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-      #    filename: ${{ env.image }}
-
       - name: "Setup AWS"
         if: ${{ inputs.publish }}
         uses: aws-actions/configure-aws-credentials@v4
@@ -166,29 +172,27 @@ jobs:
 
             destination="${{ env.bucket-path }}/${filename}"
             echo "Uploading: $image -> $destination"
-            echo aws s3 cp "$image" "s3://${{ env.bucket }}/$destination"
+            aws s3 cp "$image" "s3://${{ env.bucket }}/$destination"
             url="https://${{ env.bucket }}.s3.amazonaws.com/$destination"
             echo "url: $url"
             echo "$url" >> "${{ runner.temp }}/results.txt"
           done
-          # Note: could make a matrix from the results...
-          echo "::group::results"
-          cat -n "${{ runner.temp }}/results.txt"
-          echo "::endgroup::"
 
-      #- name: "Debug URL"
-      #  if: ${{ inputs.publish }}
-      #  continue-on-error: true
-      #  run: |
-      #    echo "url: ${{ steps.upload.outputs.url }}"
+      - name: "Debug URLs"
+        if: ${{ inputs.publish }}
+        continue-on-error: true
+        run: |
+          cat -n "${{ runner.temp }}/results.txt"
 
       - name: "Job Summary"
         if: ${{ inputs.publish }}
         continue-on-error: true
         run: |
-          md="## VHS 📼 ${{ matrix.tape }}\n\n"
+          md="## 📼 VHS ${{ matrix.tape }}\n\n"
           while IFS= read -r url; do
-            echo "Processing url: $url"
+            filename="$(basename "${url}")"
+            echo "Processing: $filename - $url"
+            md+="### ${filename}\n\n"
             md+="<${url}>\n\n"
             md+="\`\`\`text\n${url}\n\`\`\`\n\n"
             md+="[![URL](${url})](${url})\n\n"
