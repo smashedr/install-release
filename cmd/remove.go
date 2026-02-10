@@ -22,7 +22,6 @@ var removeCmd = &cobra.Command{
 		log.Debug("removeCmd:", "args", args, "binPath", binPath)
 		//noConfirm, _ := cmd.Flags().GetBool("yes")
 		//log.Debug("Flags", "noConfirm", noConfirm)
-
 		if len(args) == 0 {
 			_ = cmd.Help()
 			return

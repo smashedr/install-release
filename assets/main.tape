@@ -56,7 +56,3 @@ Left
 Sleep 0.4s
 Enter
 Sleep 1.5s
-
-Type "clear"
-Sleep 0.3s
-Enter

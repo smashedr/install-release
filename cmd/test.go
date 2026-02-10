@@ -24,7 +24,7 @@ var testCmd = &cobra.Command{
 
 		log.Warnf("This is only a test and does nothing...")
 
-		pathmgr.CheckBinPath(binPath)
+		pathmgr.CheckBinPath(binPath) // WIP
 
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
@@ -109,16 +109,13 @@ func promptPath() string {
 }
 
 func getHomePaths(homeDir string) []string {
-
 	relativePaths := []string{
 		"bin",
 		".local/bin",
 	}
-
 	absolutePaths := make([]string, len(relativePaths))
 	for i, relPath := range relativePaths {
 		absolutePaths[i] = filepath.Join(homeDir, relPath)
 	}
-
 	return absolutePaths
 }

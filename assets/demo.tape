@@ -18,3 +18,12 @@ Env TERM "xterm-256color"
 Env COLORTERM "truecolor"
 
 Source assets/main.tape
+
+Type "ir info smashedr/bup -s"
+Sleep 0.5s
+Enter
+Sleep 3s
+
+Type "clear"
+Sleep 0.3s
+Enter
