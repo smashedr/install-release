@@ -28,3 +28,7 @@ Sleep 0.3s
 Enter
 
 Source assets/main.tape
+
+Type "clear"
+Sleep 0.3s
+Enter

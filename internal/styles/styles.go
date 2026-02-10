@@ -13,10 +13,15 @@ var Value = lipgloss.NewStyle().
 	Bold(true).
 	Foreground(lipgloss.Color("#73FA91"))
 
+var Command = lipgloss.NewStyle().
+	Bold(true).
+	Background(lipgloss.Color("#00ADD8")).
+	Foreground(lipgloss.Color("#F7F7F7"))
+
 //var Head = lipgloss.NewStyle().
 //	Bold(true).
 //	Background(lipgloss.Color("#00ADD8")).
-//	Foreground(lipgloss.Color("#F7F7F7")).Width(0)
+//	Foreground(lipgloss.Color("#F7F7F7"))
 
 var TableBorder = lipgloss.NewStyle().
 	Foreground(lipgloss.Color("#bc94f7")).

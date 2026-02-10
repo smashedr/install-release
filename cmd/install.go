@@ -44,15 +44,19 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		return fmt.Errorf("repository must be in format: owner/repo")
 	}
 
-	repository := args[0]
-	log.Infof("repository: %v", repository)
-	if !strings.Contains(repository, "/") {
-		return fmt.Errorf("repository must be in format: owner/repo")
+	//repository := args[0]
+	//log.Infof("repository: %v", repository)
+	//if !strings.Contains(repository, "/") {
+	//	return fmt.Errorf("repository must be in format: owner/repo")
+	//}
+	//
+	//parts := strings.Split(repository, "/")
+	//owner := parts[0]
+	//repo := parts[1]
+	owner, repo, err := parseRepository(args[0])
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	parts := strings.Split(repository, "/")
-	owner := parts[0]
-	repo := parts[1]
 
 	tag := "latest"
 	if len(args) > 1 {
@@ -65,22 +69,23 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	log.Info("GOARCH", "runtime.GOARCH", runtime.GOARCH)
 
 	// Cache
-	dsn := "fscache://?appname=install-release&maxsize=10485760"
-	httpClient := &http.Client{
-		Transport: httpcache.NewTransport(dsn, httpcache.WithSWRTimeout(10*time.Second)),
-	}
-	// Client
-	client := github.NewClient(httpClient)
+	//dsn := "fscache://?appname=install-release&maxsize=10485760"
+	//httpClient := &http.Client{
+	//	Transport: httpcache.NewTransport(dsn, httpcache.WithSWRTimeout(10*time.Second)),
+	//}
+	//// Client
+	//client := github.NewClient(httpClient)
+	client := getClient()
 
 	// Release
-	ctx := context.Background()
-	var release *github.RepositoryRelease
-	if tag == "latest" {
-		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
-	} else {
-		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
-	}
-	//release, err := getRelease(client, owner, repo, tag)
+	//ctx := context.Background()
+	//var release *github.RepositoryRelease
+	//if tag == "latest" {
+	//	release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
+	//} else {
+	//	release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
+	//}
+	release, err := getRelease(client, owner, repo, tag)
 	if err != nil {
 		return fmt.Errorf("get release error: %w", err)
 	}
@@ -132,7 +137,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	styles.PrintKV("Asset Name:", asset.GetName())
 
 	rc, _, err := client.Repositories.DownloadReleaseAsset(
-		ctx, owner, repo, asset.GetID(), http.DefaultClient,
+		context.Background(), owner, repo, asset.GetID(), http.DefaultClient,
 	)
 	if err != nil {
 		return err
@@ -395,17 +400,25 @@ func findMatch(assets []*github.ReleaseAsset, os string, aliases []string) int {
 	return -1
 }
 
-//func getRelease(client *github.Client, owner, repo, tag string) (*github.RepositoryRelease, error) {
-//	ctx := context.Background()
-//	var release *github.RepositoryRelease
-//	var err error
-//	if tag == "latest" {
-//		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
-//	} else {
-//		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
-//	}
-//	if err != nil {
-//		return nil, fmt.Errorf("get release error: %w", err)
-//	}
-//	return release, nil
-//}
+func getClient() *github.Client {
+	dsn := "fscache://?appname=install-release&maxsize=10485760"
+	httpClient := &http.Client{
+		Transport: httpcache.NewTransport(dsn, httpcache.WithSWRTimeout(10*time.Second)),
+	}
+	return github.NewClient(httpClient)
+}
+
+func getRelease(client *github.Client, owner, repo, tag string) (*github.RepositoryRelease, error) {
+	ctx := context.Background()
+	var release *github.RepositoryRelease
+	var err error
+	if tag == "" || tag == "latest" {
+		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
+	} else {
+		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("get release error: %w", err)
+	}
+	return release, nil
+}

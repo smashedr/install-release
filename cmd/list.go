@@ -1,11 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
 	"github.com/charmbracelet/log"
-	"github.com/smashedr/install-release/internal/styles"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -56,34 +52,6 @@ var listCmd = &cobra.Command{
 		renderTable(rows, "Name", "Size")
 
 	},
-}
-
-func renderTable(rows [][]string, headers ...string) {
-	t := table.New().
-		Border(lipgloss.RoundedBorder()).
-		BorderStyle(styles.TableBorder).
-		StyleFunc(func(row, col int) lipgloss.Style {
-			if row == table.HeaderRow {
-				return styles.TableHeader
-			}
-			return styles.TableRow
-		}).
-		Headers(headers...).
-		Rows(rows...)
-	fmt.Println(t)
-}
-
-func formatBytes(bytes int64) string {
-	const unit = 1024
-	if bytes < unit {
-		return fmt.Sprintf("%d B", bytes)
-	}
-	div, exp := int64(unit), 0
-	for n := bytes / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }
 
 //func listDir(path string) {
