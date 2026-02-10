@@ -35,6 +35,7 @@ var infoCmd = &cobra.Command{
 		if len(args) >= 1 && strings.Contains(args[0], "/") {
 			owner, repo, err := parseRepository(args[0])
 			if err != nil {
+				_ = cmd.Help()
 				log.Fatal(err)
 			}
 			log.Info("Repository", "owner", owner, "repo", repo)
@@ -58,7 +59,7 @@ var infoCmd = &cobra.Command{
 				{"Author", release.GetAuthor().GetLogin()},
 				{"Assets", strconv.Itoa(len(release.Assets))},
 			}
-			renderTable(rows, "Info", "Details")
+			styles.RenderTable(rows, "Info", "Details")
 			if sumFlag {
 				return
 			}
@@ -70,11 +71,8 @@ var infoCmd = &cobra.Command{
 			//}
 			//log.Info("GetSize:", "width", width, "height", height)
 
-			lines := strings.SplitN(strings.TrimSpace(release.GetBody()), "\n", 11)
-			if len(lines) > 10 {
-				lines = lines[:10]
-			}
-			result := strings.Join(lines, "\n")
+			// Add Pager
+			result := headString(release.GetBody(), 12)
 
 			out, err := glamour.Render(result, "dracula")
 			if err != nil {
@@ -86,7 +84,7 @@ var infoCmd = &cobra.Command{
 			return
 		}
 
-		pathmgr.CheckBinPath(binPath)
+		pathmgr.CheckBinPath(binPath) // WIP
 
 		executable, err := os.Executable()
 		if err != nil {

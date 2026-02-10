@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"github.com/charmbracelet/log"
+	"github.com/dustin/go-humanize"
+	"github.com/smashedr/install-release/internal/styles"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -46,11 +48,10 @@ var listCmd = &cobra.Command{
 				log.Warn(err)
 				continue
 			}
-			rows = append(rows, []string{e.Name(), formatBytes(info.Size())})
+			rows = append(rows, []string{e.Name(), humanize.Bytes(uint64(info.Size()))})
 		}
 		log.Debugf("rows: %v", rows)
-		renderTable(rows, "Name", "Size")
-
+		styles.RenderTable(rows, "Name", "Size")
 	},
 }
 

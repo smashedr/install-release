@@ -3,6 +3,7 @@ package styles
 import (
 	"fmt"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 )
 
 var Key = lipgloss.NewStyle().
@@ -36,4 +37,19 @@ var TableRow = lipgloss.NewStyle().
 
 func PrintKV(key, value string) {
 	fmt.Println(Key.Render(key) + " " + Value.Render(value))
+}
+
+func RenderTable(rows [][]string, headers ...string) {
+	t := table.New().
+		Border(lipgloss.RoundedBorder()).
+		BorderStyle(TableBorder).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			if row == table.HeaderRow {
+				return TableHeader
+			}
+			return TableRow
+		}).
+		Headers(headers...).
+		Rows(rows...)
+	fmt.Println(t)
 }

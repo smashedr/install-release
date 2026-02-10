@@ -44,17 +44,9 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		return fmt.Errorf("repository must be in format: owner/repo")
 	}
 
-	//repository := args[0]
-	//log.Infof("repository: %v", repository)
-	//if !strings.Contains(repository, "/") {
-	//	return fmt.Errorf("repository must be in format: owner/repo")
-	//}
-	//
-	//parts := strings.Split(repository, "/")
-	//owner := parts[0]
-	//repo := parts[1]
 	owner, repo, err := parseRepository(args[0])
 	if err != nil {
+		_ = cmd.Help()
 		log.Fatal(err)
 	}
 
@@ -62,29 +54,12 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	if len(args) > 1 {
 		tag = args[1]
 	}
-	//fmt.Printf("Processing: %s/%s:%s\n", owner, repo, tag)
+
+	log.Info("runtime", "GOOS", runtime.GOOS, "GOARCH", runtime.GOARCH)
 	styles.PrintKV("Repository:", fmt.Sprintf("%s/%s:%s", owner, repo, tag))
 
-	log.Info("GOOS", "runtime.GOOS", runtime.GOOS)
-	log.Info("GOARCH", "runtime.GOARCH", runtime.GOARCH)
-
-	// Cache
-	//dsn := "fscache://?appname=install-release&maxsize=10485760"
-	//httpClient := &http.Client{
-	//	Transport: httpcache.NewTransport(dsn, httpcache.WithSWRTimeout(10*time.Second)),
-	//}
-	//// Client
-	//client := github.NewClient(httpClient)
 	client := getClient()
 
-	// Release
-	//ctx := context.Background()
-	//var release *github.RepositoryRelease
-	//if tag == "latest" {
-	//	release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
-	//} else {
-	//	release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
-	//}
 	release, err := getRelease(client, owner, repo, tag)
 	if err != nil {
 		return fmt.Errorf("get release error: %w", err)
@@ -93,7 +68,6 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		log.Debugf("release: %v", release)
 	}
 
-	//fmt.Printf("Installing Version: %s\n", release.GetTagName())
 	styles.PrintKV("Version:", release.GetTagName())
 
 	// Asset
@@ -132,7 +106,6 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	}
 
 	log.Infof("id: %v", asset.GetID())
-	//fmt.Printf("url: %s\n", asset.GetBrowserDownloadURL())
 	log.Infof("url: %v", asset.GetBrowserDownloadURL())
 	styles.PrintKV("Asset Name:", asset.GetName())
 
@@ -263,10 +236,8 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		}
 	}
 
-	// WIP
-	pathmgr.CheckBinPath(binPath)
+	pathmgr.CheckBinPath(binPath) // WIP
 
-	//fmt.Printf("\nSuccessfully Installed: %s\n", destName)
 	styles.PrintKV("Installed:", destName)
 	return nil
 }
