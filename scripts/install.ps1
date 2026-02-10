@@ -62,11 +62,11 @@ if ($bin) {
 
 if (-not (Test-Path -IsValid $binPath)) {
     Write-Host -ForegroundColor Red "Invalid path: $binPath"
-    exit 1
+    throw
 }
 if (-not (Test-Path $binPath)) {
     Write-Host -ForegroundColor Red "Directory does not exist: $binPath"
-    exit 1
+    throw
 }
 
 ## PATH
@@ -121,7 +121,7 @@ try {
     Move-Item -Path $source -Destination $binPath -Force
 } catch {
     Write-Host -ForegroundColor Red "Error: $_"
-    exit 1
+    throw
 } finally {
     if (Test-Path $tempDir) {
         Write-Host -ForegroundColor DarkCyan "Cleaning Up: $tempDir"
