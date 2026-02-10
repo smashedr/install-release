@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 $exeName = "ir"
 $repository = "smashedr/install-release"
 
-Write-Host -ForegroundColor Cyan "Installing: $repository"
+Write-Host -ForegroundColor Green "Installing: $repository"
 
 ## ARCH
 if (-not (Test-Path variable:IsWindows)) {
