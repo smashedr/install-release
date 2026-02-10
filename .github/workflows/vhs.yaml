@@ -2,21 +2,17 @@ name: "VHS Tape"
 
 on:
   workflow_dispatch:
-    inputs:
+    inputs: &inputs
       publish:
         description: Publish Tapes
         type: boolean
         default: false
-  workflow_call:
-    inputs:
-      publish:
-        description: Publish Tapes
-        type: boolean
-        default: true
       continue-on-error:
         description: Continue on Error
         type: boolean
         default: true
+  workflow_call:
+    inputs: *inputs
 
 env:
   tape-dir: assets
