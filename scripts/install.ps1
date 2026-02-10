@@ -1,61 +1,115 @@
+#!/usr/bin/env pwsh
 # https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.ps1
 param(
-    [string]$bin="$env:LOCALAPPDATA\Microsoft\WindowsApps"
+    [string]$bin=""
 )
 
 $ErrorActionPreference = "Stop"
 
-$exeName = "ir.exe"
+$exeName = "ir"
+$repository = "smashedr/install-release"
 
-#Write-Host -ForegroundColor DarkCyan "bin: $bin"
-#Write-Host -ForegroundColor DarkCyan "Architecture: $env:PROCESSOR_ARCHITECTURE"
+Write-Host -ForegroundColor Cyan "Installing: $repository"
 
-$file = switch ($env:PROCESSOR_ARCHITECTURE) {
-    "AMD64" { "ir_Windows_x86_64.zip" }
-    "x86"   { "ir_Windows_i386.zip" }
-    "ARM64" { "ir_Windows_arm64.zip" }
-    default { throw "Unsupported architecture: $env:PROCESSOR_ARCHITECTURE" }
+## ARCH
+$platform = switch ($true) {
+    $IsWindows { "Windows" }
+    $IsLinux   { "Linux" }
+    $IsMacOS   { "Darwin" }
+    default    { "unknown" }
 }
-#Write-Host -ForegroundColor DarkCyan "File: $file"
-
-$url = "https://github.com/smashedr/install-release/releases/latest/download/$file"
-
-Write-Host -ForegroundColor White "Current: $bin"
-$userInput = Read-Host "Enter Path [press <enter> to accept]"
-$binPath = if ($userInput) { $userInput } else { $binPath }
-$bin = if ($userInput) { $userInput } else { $bin }
-
-if (-not (Test-Path -IsValid $bin)) {
-    Write-Host -ForegroundColor Red "Invalid path: $bin"
-    exit 1
+Write-Host -ForegroundColor DarkCyan "platform: $platform"
+$osArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+Write-Host -ForegroundColor DarkCyan "osArchitecture: $osArchitecture"
+$arch = switch ($osArchitecture) {
+    "X64"   { "x86_64" }
+    "Arm64" { "arm64" }
+    "X86"   { "i386" }
+    default { "unknown" }
 }
-if (-not (Test-Path $bin)) {
-    Write-Host -ForegroundColor Red "Directory does not exist: $bin"
-    exit 1
-}
+Write-Host -ForegroundColor DarkCyan "arch: $arch"
 
-$pathUser = [Environment]::GetEnvironmentVariable("Path", "User")
-$paths = $pathUser -split ";" | ForEach-Object { $_.TrimEnd('\') }
-$binPath = $bin.TrimEnd('\')
-#Write-Host -ForegroundColor DarkCyan "binPath: $binPath"
-
-if ($paths -notcontains $binPath) {
-    Write-Host -ForegroundColor Yellow "Adding PATH: $binPath"
-    [Environment]::SetEnvironmentVariable("Path", "$pathUser;$bin", "User")
+## FILE
+if ($IsWindows) {
+    $exeName = "${exeName}.exe"
+    $binPath = Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps"
+    $file = "${exeName}_${platform}_${arch}.zip"
 } else {
-    Write-Host -ForegroundColor DarkGreen "Already in PATH: $binPath"
+    $binPath = Join-Path $HOME ".local/bin"
+    $file = "${exeName}_${platform}_${arch}.tar.gz"
+}
+Write-Host -ForegroundColor DarkCyan "exeName: $exeName"
+Write-Host -ForegroundColor DarkCyan "binPath: $binPath"
+Write-Host -ForegroundColor DarkCyan "file: $file"
+$url = "https://github.com/$repository/releases/latest/download/$file"
+Write-Host -ForegroundColor DarkCyan "url: $url"
+
+## BIN
+Write-Host -ForegroundColor White "Target Directory: $binPath"
+if ($bin) {
+    $binPath = $bin
+} else {
+    $userInput = Read-Host "Enter Path [press <enter> to accept]"
+    $binPath = if ($userInput) { $userInput } else { $binPath }
 }
 
-$tempDir = Join-Path $env:TEMP "install_$(Get-Random)"
-#Write-Host -ForegroundColor DarkCyan "tempDir: $tempDir"
-$zipPath = Join-Path $tempDir "download.zip"
-#Write-Host -ForegroundColor DarkCyan "zipPath: $zipPath"
+if (-not (Test-Path -IsValid $binPath)) {
+    Write-Host -ForegroundColor Red "Invalid path: $binPath"
+    exit 1
+}
+if (-not (Test-Path $binPath)) {
+    Write-Host -ForegroundColor Red "Directory does not exist: $binPath"
+    exit 1
+}
 
+## PATH
+if ($IsWindows) {
+    # Windows
+    $pathUser = [Environment]::GetEnvironmentVariable("Path", "User")
+    $paths = $pathUser -split ";" | ForEach-Object { $_.TrimEnd('\') }
+    $binPath = $binPath.TrimEnd('\')
+    Write-Host -ForegroundColor DarkCyan "binPath: $binPath"
+    if ($paths -notcontains $binPath) {
+        Write-Host -ForegroundColor Yellow "Adding PATH: $binPath"
+        [Environment]::SetEnvironmentVariable("Path", "$pathUser;$bin", "User")
+    } else {
+        Write-Host -ForegroundColor DarkGreen "Already in PATH: $binPath"
+    }
+} else {
+    # Unix
+    if ($env:PATH -split ':' -notcontains $binPath) {
+        Write-Host -ForegroundColor Yellow "Adding PATH: $binPath"
+        $env:PATH += [IO.Path]::PathSeparator + $binPath
+        if (!(Test-Path -Path $PROFILE)) {
+            New-Item -ItemType File -Path $PROFILE -Force | Out-Null
+        }
+        Add-Content -Path $PROFILE -Value "`$env:PATH += ':$binPath'"
+    } else {
+        Write-Host -ForegroundColor DarkGreen "Already in PATH: $binPath"
+    }
+}
+
+## TEMP
+$temp = [system.io.path]::GetTempPath()
+Write-Host -ForegroundColor DarkCyan "temp: $temp"
+$tempDir = Join-Path $temp "install_$(Get-Random)"
+Write-Host -ForegroundColor DarkCyan "tempDir: $tempDir"
+$zipPath = Join-Path $tempDir $file
+Write-Host -ForegroundColor DarkCyan "zipPath: $zipPath"
+
+## EXEC
 try {
+    # Download
     Write-Host -ForegroundColor DarkCyan "Downloading: $url"
     New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
     Invoke-WebRequest -Uri $url -OutFile $zipPath
-    Expand-Archive -Path $zipPath -DestinationPath $tempDir -Force
+    # Extract
+    if ($zipPath -like "*.tar.gz") {
+        tar -xzf $zipPath -C $tempDir
+    } else {
+        Expand-Archive -Path $zipPath -DestinationPath $tempDir -Force
+    }
+    # Install
     $source = Join-Path $tempDir $exeName
     Move-Item -Path $source -Destination $binPath -Force
 } catch {
@@ -63,7 +117,7 @@ try {
     exit 1
 } finally {
     if (Test-Path $tempDir) {
-        #Write-Host -ForegroundColor DarkCyan "Cleaning Up: $tempDir"
+        Write-Host -ForegroundColor DarkCyan "Cleaning Up: $tempDir"
         Remove-Item -Path $tempDir -Recurse -Force
     }
 }
@@ -71,4 +125,4 @@ try {
 $location = Join-Path $binPath $exeName
 Write-Host -ForegroundColor DarkCyan "Location: $location "
 Write-Host -ForegroundColor Green "Installation Successful!"
-Write-Host -ForegroundColor White "To get started, run: ir --help"
+Write-Host -ForegroundColor White "To get started run: ir --help"

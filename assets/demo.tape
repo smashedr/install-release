@@ -19,7 +19,7 @@ Env COLORTERM "truecolor"
 
 Source assets/main.tape
 
-Type "ir info smashedr/bup -s"
+Type "ir info smashedr/bup"
 Sleep 0.5s
 Enter
 Sleep 3s

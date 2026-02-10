@@ -1,2 +1,3 @@
 docs/** linguist-documentation
+scripts/** linguist-vendored
 *.iss linguist-vendored
