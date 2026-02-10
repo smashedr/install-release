@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        tapes: [demo, banner]
+        tape: [demo, banner]
 
     permissions:
       contents: read
