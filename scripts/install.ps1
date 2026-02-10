@@ -14,11 +14,10 @@ $repository = "smashedr/install-release"
 Write-Host -ForegroundColor Cyan "Installing: $repository"
 
 ## ARCH
-
 if (-not (Test-Path variable:IsWindows)) {
+    Write-Host -ForegroundColor DarkCyan "Windows Detected. Forcing IsWindows."
     $script:IsWindows = $true
 }
-
 $platform = switch ($true) {
     $IsWindows { "Windows" }
     $IsLinux   { "Linux" }
@@ -86,6 +85,7 @@ if ($IsWindows) {
     # Unix
     if ($env:PATH -split ':' -notcontains $binPath) {
         Write-Host -ForegroundColor Yellow "Adding PATH: $binPath"
+        Write-Host -ForegroundColor DarkCyan "Profile: $PROFILE"
         $env:PATH += [IO.Path]::PathSeparator + $binPath
         if (!(Test-Path -Path $PROFILE)) {
             New-Item -ItemType File -Path $PROFILE -Force | Out-Null
