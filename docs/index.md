@@ -83,6 +83,12 @@ Install to a different bin directory.
 ir owner/repo -b /usr/local/bin
 ```
 
+Get package information.
+
+```shell
+ir info owner/repo
+```
+
 List installed apps.
 
 ```shell
