@@ -7,10 +7,10 @@ on:
         description: Publish Tapes
         type: boolean
         default: false
-      continue-on-error:
-        description: Continue on Error
-        type: boolean
-        default: true
+      #continue-on-error:
+      #  description: Continue on Error
+      #  type: boolean
+      #  default: true
   workflow_call:
     inputs: *inputs
 
@@ -25,7 +25,7 @@ jobs:
     name: "VHS ${{ matrix.tape }}"
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    continue-on-error: ${{ inputs.continue-on-error }}
+    #continue-on-error: ${{ inputs.continue-on-error }}
     strategy:
       fail-fast: false
       matrix:
