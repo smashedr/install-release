@@ -38,9 +38,9 @@ Write-Host -ForegroundColor DarkCyan "arch: $arch"
 
 ## FILE
 if ($IsWindows) {
-    $exeName = "${exeName}.exe"
     $binPath = Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps"
     $file = "${exeName}_${platform}_${arch}.zip"
+    $exeName = "${exeName}.exe"
 } else {
     $binPath = Join-Path $HOME ".local/bin"
     $file = "${exeName}_${platform}_${arch}.tar.gz"
