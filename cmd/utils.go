@@ -16,10 +16,10 @@ func parseRepository(repository string) (owner, repo string, err error) {
 	return split[0], split[1], nil
 }
 
-func headString(text string, length int) string {
-	lines := strings.SplitN(strings.TrimSpace(text), "\n", length+1)
-	if len(lines) > length {
-		lines = lines[:length]
-	}
-	return strings.Join(lines, "\n")
-}
+//func headString(text string, length int) string {
+//	lines := strings.SplitN(strings.TrimSpace(text), "\n", length+1)
+//	if len(lines) > length {
+//		lines = lines[:length]
+//	}
+//	return strings.Join(lines, "\n")
+//}
