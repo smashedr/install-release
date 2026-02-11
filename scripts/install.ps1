@@ -132,4 +132,4 @@ try {
 $location = Join-Path $binPath $exeName
 Write-Host -ForegroundColor DarkCyan "Location: $location "
 Write-Host -ForegroundColor Green "Installation Successful!"
-Write-Host -ForegroundColor White "To get started run: ir --help"
+Write-Host -ForegroundColor White "To get started run: $exeName --help"
