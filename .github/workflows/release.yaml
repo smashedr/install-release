@@ -225,6 +225,8 @@ jobs:
     uses: ./.github/workflows/vhs.yaml
     needs: [release]
     secrets: inherit
+    with:
+      publish: true
 
     permissions:
       contents: read
