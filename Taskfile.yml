@@ -6,6 +6,7 @@ env:
 
 tasks:
   goup:
+    aliases: [goget, tidy]
     cmd: |
       go get -u
       go mod tidy

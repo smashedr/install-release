@@ -23,8 +23,10 @@
 === ":simple-go: source"
 
     ```shell
-    go install github.com/smashedr/install-release@latest
+    go install github.com/smashedr/install-release@latest  # (1)!
     ```
+
+    1. Requires Go: <https://go.dev/doc/install>
 
 === ":simple-docker: docker"
 
@@ -32,7 +34,7 @@
     docker run --rm -itv ~/bin:/out ghcr.io/smashedr/ir:latest -b /out smashedr/install-release  # (1)!
     ```
 
-    1. _Note: Docker requires you to mount the target bin directory and specify the path._
+    1. _Note: Docker requires you to mount the target bin directory._
 
 :fontawesome-brands-windows: Windows users can download the [Windows&nbsp;Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).  
 :lucide-download: Alternatively, you can manually [download&nbsp;a&nbsp;release](https://github.com/smashedr/install-release/releases).
