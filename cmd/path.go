@@ -26,6 +26,10 @@ var pathCmd = &cobra.Command{
 		binPath := viper.GetString("bin")
 		log.Debug("pathCmd:", "args", args, "binPath", binPath)
 
+		if os.Getenv("DOCKER") == "true" {
+			log.Errorf("PATH does not work DOCKER.")
+			return
+		}
 		if len(args) < 2 {
 			_ = cmd.Help()
 			return

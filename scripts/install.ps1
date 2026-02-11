@@ -2,6 +2,7 @@
 # https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.ps1
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
+
 param(
     [string]$bin=""
 )
@@ -22,7 +23,10 @@ $platform = switch ($true) {
     $IsWindows { "Windows" }
     $IsLinux   { "Linux" }
     $IsMacOS   { "Darwin" }
-    default    { "unknown" }
+    default    {
+        Write-Host -ForegroundColor Red "Unable to detect platform!"
+        throw
+    }
 }
 Write-Host -ForegroundColor DarkCyan "platform: $platform"
 $osArchitecture = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture
@@ -31,7 +35,10 @@ $arch = switch ($osArchitecture) {
     "X64"   { "x86_64" }
     "Arm64" { "arm64" }
     "X86"   { "i386" }
-    default { "unknown" }
+    default    {
+        Write-Host -ForegroundColor Red "Unsupported architecture: $osArchitecture"
+        throw
+    }
 }
 Write-Host -ForegroundColor DarkCyan "arch: $arch"
 

@@ -4,9 +4,14 @@ import (
 	"fmt"
 	"github.com/charmbracelet/log"
 	"github.com/smashedr/install-release/internal/styles"
+	"os"
 )
 
 func CheckBinPath(binPath string) {
+	if os.Getenv("DOCKER") == "true" {
+		log.Infof("Skipping CheckBinPath in DOCKER.")
+		return
+	}
 	//fmt.Printf("CheckBinPath: %s\n", binPath)
 	result, _, _ := IsDirInPath(binPath)
 	//fmt.Printf("result: %v\n", result)
