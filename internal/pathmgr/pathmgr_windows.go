@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/charmbracelet/log"
+	"github.com/smashedr/install-release/internal/styles"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -45,12 +46,12 @@ func IsDirInPath(dirPath string) (found bool, pathType uint32, err error) {
 }
 
 func AddDirToPath(dirPath string, pathType, addType int) (bool, int, error) {
-	log.Infof("AddDirToPath: %v\n", dirPath)
-	log.Infof("pathType: %v\n", pathType)
-	log.Infof("addType: %v\n", addType)
+	log.Infof("AddDirToPath: %v", dirPath)
+	log.Infof("pathType: %v", pathType)
+	log.Infof("addType: %v", addType)
 
 	dllPath, _ := getDLLPath()
-	log.Infof("dllPath: %v\n", dllPath)
+	log.Infof("dllPath: %v", dllPath)
 
 	pathMgr := syscall.MustLoadDLL(dllPath)
 	//defer func() { _ = pathMgr.Release() }()
@@ -67,20 +68,20 @@ func AddDirToPath(dirPath string, pathType, addType int) (bool, int, error) {
 		uintptr(addType),  // 0 end - 1 start
 	)
 	if err != nil {
-		log.Warnf("err: %v", err)
+		log.Infof("addDirToPath.Call: %v", err)
 	}
 	//fmt.Printf("ret: %v\n", ret)
 
 	switch ret {
 	case 0:
-		fmt.Println("Directory added to PATH")
+		styles.PrintKV("Added PATH:", dirPath)
 		return true, int(ret), nil
 	case 183:
-		fmt.Println("Directory already in PATH")
+		log.Warnf("Already in PATH: %v", dirPath)
 		return true, int(ret), nil
 	default:
-		fmt.Printf("Error adding to PATH: %d\n", ret)
-		return false, int(ret), nil
+		log.Errorf("Error adding to PATH: %d", ret)
+		return false, int(ret), fmt.Errorf("error adding path: %v", ret)
 	}
 }
 

@@ -1,0 +1,34 @@
+version: "2"
+linters:
+  settings:
+    govet:
+      # Disable all analyzers.
+      # Default: false
+      #disable-all: true
+      # Enable analyzers by name.
+      # Default: []
+      #enable: []
+      # Enable all analyzers.
+      # Default: false
+      #enable-all: true
+      # Disable analyzers by name.
+      # Default: []
+      disable: [printf]
+      # Settings per analyzer.
+      settings:
+        # Analyzer name, run `go tool vet help` to see all analyzers.
+        #printf:
+        #  # Comma-separated list of print function names to check (in addition to default, see `go tool vet help printf`).
+        #  # Default: []
+        #  funcs: []
+        #shadow:
+        #  # Whether to be strict about shadowing; can be noisy.
+        #  # Default: false
+        #  #strict: true
+        #unusedresult:
+        #  # Comma-separated list of functions whose results must be used.
+        #  # Default: []
+        #  #funcs: [pkg.MyFunc]
+        #  # Comma-separated list of names of methods of type func() string whose results must be used.
+        #  # Default: []
+        #  #stringmethods: [MyMethod]
