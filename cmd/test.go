@@ -22,6 +22,11 @@ var testCmd = &cobra.Command{
 		binPath := viper.GetString("bin")
 		log.Debug("testCmd:", "args", args, "binPath", binPath)
 
+		if os.Getenv("DOCKER") == "true" {
+			log.Errorf("PATH does not work DOCKER.")
+			return
+		}
+
 		log.Warnf("This is only a test and does nothing...")
 
 		//// Enable Console on Windows (rendering a table does this)

@@ -48,6 +48,9 @@ Easily Install GitHub Release binaries with Windows, Linux and macOS Support.
 
 ## Install
 
+[![Latest Release](https://img.shields.io/github/v/release/smashedr/install-release?logo=github&label=latest%20release)](https://github.com/smashedr/install-release/releases)
+[![Windows Installer](https://img.shields.io/badge/download-windows--installer.exe-blue?logo=data:image/svg%2bxml;base64,PHN2ZyB3aWR0aD0iMjQ5MCIgaGVpZ2h0PSIyNTAwIiB2aWV3Qm94PSIwIDAgMjU2IDI1NyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCI+PHBhdGggZD0iTTAgMzYuMzU3TDEwNC42MiAyMi4xMWwuMDQ1IDEwMC45MTQtMTA0LjU3LjU5NUwwIDM2LjM1OHptMTA0LjU3IDk4LjI5M2wuMDggMTAxLjAwMkwuMDgxIDIyMS4yNzVsLS4wMDYtODcuMzAyIDEwNC40OTQuNjc3em0xMi42ODItMTE0LjQwNUwyNTUuOTY4IDB2MTIxLjc0bC0xMzguNzE2IDEuMVYyMC4yNDZ6TTI1NiAxMzUuNmwtLjAzMyAxMjEuMTkxLTEzOC43MTYtMTkuNTc4LS4xOTQtMTAxLjg0TDI1NiAxMzUuNnoiIGZpbGw9IiMwMEFERUYiLz48L3N2Zz4=)](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe)
+
 #### Homebrew
 
 ```shell
@@ -60,7 +63,7 @@ brew install cssnr/tap/install-release
 curl https://i.jpillora.com/smashedr/install-release! | bash
 ```
 
-Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
+💾 Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
 
 #### PowerShell
 
@@ -68,7 +71,7 @@ Alternatively, you can manually [download a release](https://github.com/smashedr
 iex (iwr -useb 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.ps1').Content
 ```
 
-Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).
+🪟 Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).
 
 #### Source
 
