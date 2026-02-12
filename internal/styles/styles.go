@@ -6,6 +6,13 @@ import (
 	"github.com/charmbracelet/lipgloss/table"
 )
 
+var Success = lipgloss.NewStyle().
+	Bold(true).
+	Foreground(lipgloss.Color("#00ff00"))
+var Failure = lipgloss.NewStyle().
+	Bold(true).
+	Foreground(lipgloss.Color("#ff0000"))
+
 var Key = lipgloss.NewStyle().
 	Bold(true).
 	Foreground(lipgloss.Color("#00ADD8")).
@@ -35,6 +42,12 @@ var TableRow = lipgloss.NewStyle().
 	Foreground(lipgloss.Color("#F8F8F8")).
 	PaddingLeft(1).PaddingRight(1)
 
+func PrintS(key, format string, args ...interface{}) {
+	fmt.Println(Success.Render(key) + " " + fmt.Sprintf(format, args...))
+}
+func PrintF(key, format string, args ...interface{}) {
+	fmt.Println(Failure.Render(key) + " " + fmt.Sprintf(format, args...))
+}
 func PrintKV(key, value string) {
 	fmt.Println(Key.Render(key) + " " + Value.Render(value))
 }

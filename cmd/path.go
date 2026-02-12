@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/charmbracelet/log"
 	"github.com/smashedr/install-release/internal/pathmgr"
+	"github.com/smashedr/install-release/internal/styles"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -37,27 +37,31 @@ var pathCmd = &cobra.Command{
 
 		command := strings.ToLower(args[0])
 		path := args[1]
-		fmt.Printf("command: %s\n", command)
-		fmt.Printf("path: %s\n", path)
+		log.Info("Request", "command", command, "path", path)
 
 		switch command {
 		case "a", "ad", "add":
+			// NOTE: Add output here and remove from AddDirToPath
 			added, ret, err := pathmgr.AddDirToPath(path, 1, 0)
-			fmt.Printf("added: %v\n", added)
-			fmt.Printf("ret: %v\n", ret)
-			fmt.Printf("err: %v\n", err)
+			if err != nil {
+				log.Fatalf("pathmgr.AddDirToPath: %v", err)
+			}
+			log.Info("AddDirToPath", "added", added, "ret", ret, "err", err)
 		case "r", "re", "rem", "remove":
 			log.Fatal("INOP: The remove command is not yet functional...")
 		case "c", "ch", "chk", "check":
 			found, findType, err := pathmgr.IsDirInPath(path)
-			fmt.Printf("--------------------\n")
-			fmt.Printf("found: %v\n", found)
-			fmt.Printf("findType: %v\n", findType)
-			fmt.Printf("err: %v\n", err)
+			log.Info("IsDirInPath", "found", found, "findType", findType, "err", err)
+			if err != nil {
+				log.Fatalf("pathmgr.AddDirToPath: %v", err)
+			} else if found {
+				styles.PrintS("Found in PATH:", path)
+			} else {
+				styles.PrintF("NOT in PATH:", path)
+			}
 		default:
-			fmt.Printf("Unknown command: %v\n", command)
-			fmt.Printf("Usage: [check/add/remove] [path]\n")
-			os.Exit(1)
+			log.Errorf("Unknown command: %v", command)
+			log.Fatalf("Usage: [check/add/remove] [path]")
 		}
 	},
 }

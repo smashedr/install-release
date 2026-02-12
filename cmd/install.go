@@ -183,11 +183,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		destName = before
 	}
 	log.Debugf("2 destName: %v", destName)
-	if runtime.GOOS == "windows" {
-		if !strings.HasSuffix(destName, ".exe") {
-			destName += ".exe"
-		}
-	}
+	destName = ensureWinExt(destName)
 	log.Debugf("3 destName: %v", destName)
 	if !skipPrompts {
 		form := huh.NewInput().
@@ -208,6 +204,8 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		}
 		log.Debugf("4 destName: %v", destName)
 	}
+	destName = ensureWinExt(destName)
+	log.Debugf("5 destName: %v", destName)
 
 	// Make sure it is executable
 	info, err := os.Stat(binaryFilePath)
@@ -392,4 +390,14 @@ func getRelease(client *github.Client, owner, repo, tag string) (*github.Reposit
 		return nil, fmt.Errorf("get release error: %w", err)
 	}
 	return release, nil
+}
+
+func ensureWinExt(destName string) string {
+	if runtime.GOOS == "windows" {
+		if !strings.HasSuffix(destName, ".exe") {
+			log.Debugf("Adding .exe to filename: %v", destName)
+			destName += ".exe"
+		}
+	}
+	return destName
 }
