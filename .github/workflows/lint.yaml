@@ -68,6 +68,20 @@ jobs:
         with:
           shellcheck_opts: -e SC2129
 
+      - name: "hadolint"
+        if: ${{ !cancelled() }}
+        uses: hadolint/hadolint-action@v3.3.0
+        with:
+          dockerfile: Dockerfile
+
+      #- name: "ShellCheck"
+      #  if: ${{ !cancelled() }}
+      #  uses: ludeeus/action-shellcheck@master
+      #  env:
+      #    SHELLCHECK_OPTS: -x
+      #  with:
+      #    scandir: scripts
+
   golint:
     name: "GoLint - ${{ matrix.os }}"
     if: ${{ !contains(github.event.head_commit.message, '#nolint') }}
