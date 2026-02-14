@@ -21,7 +21,7 @@ var infoCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := viper.GetString("bin")
 		//sumFlag, _ := cmd.Flags().GetBool("summary")
-		log.Debug("infoCmd:", "args", args, "binPath", binPath)
+		log.Debug("infoCmd", "args", args, "binPath", binPath)
 
 		if len(args) >= 1 && strings.Contains(args[0], "/") {
 			owner, repo, err := parseRepository(args[0])

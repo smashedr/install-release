@@ -13,21 +13,26 @@ import (
 )
 
 var removeCmd = &cobra.Command{
-	Use:     "remove",
+	Use:     "remove [name]",
 	Aliases: []string{"r", "re", "rem", "rm"},
 	Short:   "Remove an installed program",
 	Long:    "Remove an installed program.",
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := viper.GetString("bin")
-		log.Debug("removeCmd:", "args", args, "binPath", binPath)
+		log.Debug("removeCmd", "args", args, "binPath", binPath)
 		//noConfirm, _ := cmd.Flags().GetBool("yes")
 		//log.Debug("Flags", "noConfirm", noConfirm)
-		if len(args) == 0 {
-			_ = cmd.Help()
-			return
-		}
 
-		name := args[0]
+		var name string
+		var err error
+		if len(args) == 0 {
+			name, err = promptAsset(binPath)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			name = args[0]
+		}
 		log.Infof("name: %v", name)
 
 		path := filepath.Join(binPath, name)
@@ -53,8 +58,7 @@ var removeCmd = &cobra.Command{
 			Negative("Cancel").
 			Value(&confirm).
 			WithTheme(huh.ThemeDracula())
-		err := form.Run()
-		if err != nil {
+		if err := form.Run(); err != nil {
 			log.Fatalf("prompt error: %v", err)
 		}
 		log.Infof("confirm: %v", confirm)
@@ -62,12 +66,34 @@ var removeCmd = &cobra.Command{
 			return
 		}
 
-		err = os.Remove(path)
-		if err != nil {
+		if err := os.Remove(path); err != nil {
 			log.Fatalf("prompt error: %v", err)
 		}
 		styles.PrintKV("Removed:", name)
 	},
+}
+
+func promptAsset(binPath string) (string, error) {
+	log.Info("promptAsset", "binPath", binPath)
+	entries, err := os.ReadDir(binPath)
+	if err != nil {
+		return "", err
+	}
+	log.Infof("entries: %v", entries)
+
+	options := make([]huh.Option[string], len(entries))
+	for i, asset := range entries {
+		options[i] = huh.NewOption(asset.Name(), asset.Name())
+	}
+	var result string
+	form := huh.NewSelect[string]().
+		Title("Select App to Remove:").
+		Options(options...).
+		Value(&result)
+	if err := form.Run(); err != nil {
+		return result, fmt.Errorf("prompt failed: %w", err)
+	}
+	return result, nil
 }
 
 func init() {

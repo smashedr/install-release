@@ -20,7 +20,7 @@ var testCmd = &cobra.Command{
 	Long:    "Test command.",
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := viper.GetString("bin")
-		log.Debug("testCmd:", "args", args, "binPath", binPath)
+		log.Debug("testCmd", "args", args, "binPath", binPath)
 
 		if os.Getenv("DOCKER") == "true" {
 			log.Errorf("PATH does not work DOCKER.")
@@ -68,8 +68,7 @@ var testCmd = &cobra.Command{
 			Options(options...).
 			Value(&result)
 
-		err = form.Run()
-		if err != nil {
+		if err := form.Run(); err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
 			return
 		}
@@ -116,8 +115,7 @@ func promptPath() string {
 		Prompt("> ").
 		Validate(validate).
 		Value(&result)
-	err := form.Run()
-	if err != nil {
+	if err := form.Run(); err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return ""
 	}

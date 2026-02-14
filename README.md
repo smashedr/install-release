@@ -165,7 +165,6 @@ task docs
 Inno Setup: <https://jrsoftware.org/isdl.php>
 
 ```shell
-task pathmgr
 task inno
 ```
 
