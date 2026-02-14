@@ -6,7 +6,7 @@ env:
 
 tasks:
   goup:
-    aliases: [goget, tidy]
+    aliases: [go, tidy]
     cmd: |
       go get -u
       go mod tidy
@@ -55,11 +55,14 @@ tasks:
       unzip dist/pathmgr.zip -d dist/PathMgr
 
   install:
+    vars:
+      SOURCE_NAME: install-release
+      TARGET_NAME: ir
     cmd: |
       go build
-      mv install-release "${HOME}/bin/ir"
-      which ir
-      ir -V
+      mv -f {{.SOURCE_NAME}} "${HOME}/bin/{{.TARGET_NAME}}"
+      which {{.TARGET_NAME}}
+      {{.TARGET_NAME}} -V
 
   vhs:*:
     desc: Create VHS Tape
@@ -68,3 +71,18 @@ tasks:
     cmd: |
       echo "Creating Tape - assets/{{.TAPE_FILE}}.tape"
       vhs "assets/{{.TAPE_FILE}}.tape"
+
+  build:*:*:
+    desc: Build OS:ARCH
+    vars:
+      OS: "{{index .MATCH 0}}"
+      ARCH: "{{index .MATCH 1}}"
+    requires:
+      vars:
+        - name: OS
+          enum: [darwin, linux, windows]
+        - name: ARCH
+          enum: [amd64, arm64, "386"]
+    cmd: |
+      echo "Building: {{.OS}} / {{.ARCH}}"
+      GOOS={{.OS}} GOARCH={{.ARCH}} goreleaser build --snapshot --clean --single-target {{.CLI_ARGS}}

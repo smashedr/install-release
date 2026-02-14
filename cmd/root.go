@@ -37,48 +37,49 @@ func init() {
 	rootCmd.Flags().StringP("asset", "a", "", "asset name to download")
 	rootCmd.Flags().StringP("name", "n", "", "binary file name to use")
 	rootCmd.Flags().BoolP("yes", "y", false, "answer yes to prompts")
-	rootCmd.Flags().StringP("bin", "b", "", "bin path to use")
-	_ = viper.BindPFlag("bin", rootCmd.Flags().Lookup("bin"))
+
+	rootCmd.PersistentFlags().StringP("bin", "b", "", "bin path to use")
+	_ = viper.BindPFlag("bin", rootCmd.PersistentFlags().Lookup("bin"))
 	rootCmd.PersistentFlags().CountVarP(&verbose, "verbose", "v", "verbose output (-vvv debug)")
+
 	rootCmd.Flags().BoolP("version", "V", false, "show installed version")
 }
 
 func onInitialize() {
-	initLogger(verbose)
+	initLogger()
 	log.Info("Log Level", "verbose", verbose)
 
+	configName := "install-release"
 	//viper.SetEnvPrefix("ir")
 	viper.SetConfigType("yaml")
-	configName := "install-release"
 	viper.SetConfigName(configName)
-
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("$HOME")
-	viper.AddConfigPath("$HOME/.config")
-	viper.AddConfigPath("$HOME/AppData/Local")
-	viper.AddConfigPath("$HOME/AppData/Roaming")
-	viper.AddConfigPath("$HOME/Library/Application Support")
-
 	homeDir, err := os.UserHomeDir()
-	log.Debugf("homeDir: %v", homeDir)
 	if err != nil {
-		homeDir = "." // fallback to retarded AI
+		log.Warnf("os.UserHomeDir err: %v", err)
+		homeDir = "."
 	}
+	log.Debugf("homeDir: %v", homeDir)
+	configPath := filepath.Join(homeDir, ".config")
+	log.Debugf("configPath: %v", configPath)
+	viper.AddConfigPath(configPath)
 	defaultBinPath := filepath.Join(homeDir, "bin")
 	log.Debugf("defaultBinPath: %v", defaultBinPath)
 	viper.SetDefault("bin", defaultBinPath)
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Debugf("viper.ConfigFileUsed: %v", viper.ConfigFileUsed())
-		configPath := filepath.Join(homeDir, ".config")
-		log.Debugf("configPath: %v", configPath)
-		_ = os.MkdirAll(configPath, 0755)
+		if err := os.MkdirAll(configPath, 0755); err != nil {
+			log.Fatalf("Creating config directory: %v: %v", configPath, err)
+		}
 		configFile := filepath.Join(configPath, configName+".yaml")
 		log.Infof("Config File: %v", configFile)
 		viper.SetConfigFile(configFile)
-		_ = viper.SafeWriteConfigAs(configFile)
+		if err := viper.SafeWriteConfigAs(configFile); err != nil {
+			// NOTE: This will error if the config file exist
+			log.Debugf("SafeWriteConfigAs: %v: %v", configFile, err)
+		}
 		if err := viper.ReadInConfig(); err != nil {
-			fmt.Printf("Error reading config: %sUsing Default Config!", configFile)
+			log.Fatalf("Reading config: %v: %v", configFile, err)
 		}
 	} else {
 		log.Infof("Config File: %v", viper.ConfigFileUsed())
@@ -87,17 +88,17 @@ func onInitialize() {
 	binPath := viper.GetString("bin")
 	log.Infof("Bin Path: %v", binPath)
 	if err = os.MkdirAll(binPath, 0755); err != nil {
-		log.Fatal("Error creating bin directory!")
+		log.Fatal("Creating bin directory: %v", err)
 	}
 }
 
-func initLogger(verbosity int) {
-	log.SetReportCaller(verbosity >= 3)
-	log.SetReportTimestamp(verbosity >= 3)
+func initLogger() {
+	log.SetReportCaller(verbose >= 3)
+	log.SetReportTimestamp(verbose >= 3)
 	log.SetTimeFormat("15:04:05")
 	//log.SetPrefix("ir")
 
-	switch verbosity {
+	switch verbose {
 	case 0:
 		log.SetLevel(log.WarnLevel) // Default
 	case 1:

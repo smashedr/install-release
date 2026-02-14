@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -33,7 +34,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	cmd.SilenceUsage = true // set here so subcommands do not silence usage
 	var err error
 	binPath := viper.GetString("bin")
-	log.Debug("runInstall:", "args", args, "binPath", binPath)
+	log.Debug("runInstall", "args", args, "binPath", binPath)
 	skipPrompts, _ := cmd.Flags().GetBool("yes")
 	assetName, _ := cmd.Flags().GetString("asset")
 	destName, _ := cmd.Flags().GetString("name")
@@ -130,14 +131,12 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	log.Infof("tmpFile: %v", tmpFile.Name())
 
 	// Write Download to File
-	_, err = io.Copy(tmpFile, rc)
-	if err != nil {
+	if _, err := io.Copy(tmpFile, rc); err != nil {
 		return fmt.Errorf("write File error: %w", err)
 	}
 
 	// Seek Back to Start of File
-	_, err = tmpFile.Seek(0, 0)
-	if err != nil {
+	if _, err := tmpFile.Seek(0, 0); err != nil {
 		return fmt.Errorf("seek error: %w", err)
 	}
 
@@ -198,8 +197,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 				return nil
 			}).
 			Value(&destName)
-		err = form.Run()
-		if err != nil {
+		if err := form.Run(); err != nil {
 			log.Fatalf("Prompt failed %v", err)
 		}
 		log.Debugf("4 destName: %v", destName)
@@ -228,8 +226,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 			return fmt.Errorf("failed to read file: %w", err)
 		}
 		// Write to destination with executable permissions
-		err = os.WriteFile(destPath, data, 0755)
-		if err != nil {
+		if err := os.WriteFile(destPath, data, 0755); err != nil {
 			return fmt.Errorf("failed to write file: %w", err)
 		}
 	}
@@ -400,4 +397,14 @@ func ensureWinExt(destName string) string {
 		}
 	}
 	return destName
+}
+
+func parseRepository(repository string) (owner, repo string, err error) {
+	var repoPattern = regexp.MustCompile(`^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$`)
+
+	if !repoPattern.MatchString(repository) {
+		return "", "", fmt.Errorf("repository must be in format: owner/repo")
+	}
+	split := strings.Split(repository, "/")
+	return split[0], split[1], nil
 }

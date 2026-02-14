@@ -10,11 +10,6 @@ import (
 	"strings"
 )
 
-//const (
-//	PathTypeSystem = 0
-//	PathTypeUser   = 1
-//)
-
 var pathCmd = &cobra.Command{
 	Use:     "path check/add/remove path",
 	Aliases: []string{"p", "pa", "pat"},
@@ -24,7 +19,7 @@ var pathCmd = &cobra.Command{
 	//Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := viper.GetString("bin")
-		log.Debug("pathCmd:", "args", args, "binPath", binPath)
+		log.Debug("pathCmd", "args", args, "binPath", binPath)
 
 		if os.Getenv("DOCKER") == "true" {
 			log.Errorf("PATH does not work DOCKER.")
