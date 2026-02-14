@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/charmbracelet/log"
 	"github.com/dustin/go-humanize"
-	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/smashedr/install-release/internal/styles"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -54,7 +53,7 @@ var infoCmd = &cobra.Command{
 			return
 		}
 
-		pathmgr.CheckBinPath(binPath) // WIP
+		//pathmgr.CheckBinPath(binPath) // WIP
 
 		executable, err := os.Executable()
 		if err != nil {

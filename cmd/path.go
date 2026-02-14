@@ -45,10 +45,10 @@ var pathCmd = &cobra.Command{
 		case "r", "re", "rem", "remove":
 			log.Fatal("INOP: The remove command is not yet functional...")
 		case "c", "ch", "chk", "check":
-			found, findType, err := pathmgr.IsDirInPath(path)
-			log.Info("IsDirInPath", "found", found, "findType", findType, "err", err)
+			found, err := pathmgr.IsDirInPath(path)
+			log.Info("IsDirInPath", "found", found, "err", err)
 			if err != nil {
-				log.Fatalf("pathmgr.AddDirToPath: %v", err)
+				log.Fatalf("pathmgr.IsDirInPath: %v", err)
 			} else if found {
 				styles.PrintS("Found in PATH:", path)
 			} else {

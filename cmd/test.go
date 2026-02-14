@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/log"
-	"github.com/smashedr/install-release/internal/pathmgr"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -45,8 +44,6 @@ var testCmd = &cobra.Command{
 		//
 		//styles.PrintKV("Release URL:", release.GetHTMLURL())
 		//return
-
-		pathmgr.CheckBinPath(binPath) // WIP
 
 		homeDir, err := os.UserHomeDir()
 		if err != nil {

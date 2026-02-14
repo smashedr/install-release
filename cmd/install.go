@@ -231,7 +231,13 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		}
 	}
 
-	pathmgr.CheckBinPath(binPath) // WIP
+	//pathmgr.CheckBinPath(binPath) // WIP
+	isInPath, err := pathmgr.IsDirInPath(binPath)
+	if err != nil {
+		log.Warnf("Checking if bin is in PATH: %v", err)
+	} else if !isInPath {
+		log.Warnf("Bin directory not in PATH: %v", binPath)
+	}
 
 	styles.PrintKV("Installed:", destName)
 	return nil
