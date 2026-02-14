@@ -4,12 +4,17 @@ version: "3"
 env:
   CGO_ENABLED: 0
 
+vars:
+  EXE: ir
+
 tasks:
-  goup:
-    aliases: [go, tidy]
-    cmd: |
-      go get -u
-      go mod tidy
+  tidy:
+    cmd: go mod tidy
+
+  go:
+    cmds:
+      - go get -u
+      - task: tidy
 
   lint:
     desc: Lint
@@ -48,7 +53,7 @@ tasks:
 
   pathmgr:
     desc: Download PathMgr
-    if: test ! -d dist/PathMgr
+    status: [test ! -d dist/PathMgr]
     cmd: |
       mkdir -p dist
       wget https://github.com/Bill-Stewart/PathMgr/releases/download/v2.0.0/PathMgr-2.0.0.zip -O dist/pathmgr.zip
@@ -56,11 +61,13 @@ tasks:
 
   install:
     vars:
-      SOURCE_NAME: install-release
-      TARGET_NAME: ir
+      TARGET_NAME: '{{.EXE}}{{if eq OS "windows"}}.exe{{end}}'
+      TARGET_DIR: '${HOME}{{if eq OS "windows"}}\bin\{{else}}/bin/{{end}}{{.TARGET_NAME}}'
     cmd: |
-      go build
-      mv -f {{.SOURCE_NAME}} "${HOME}/bin/{{.TARGET_NAME}}"
+      go build -o {{.TARGET_NAME}}
+      echo "Name: {{.TARGET_NAME}}"
+      mv "{{.TARGET_NAME}}" "{{.TARGET_DIR}}"
+      echo "Path: {{.TARGET_DIR}}"
       which {{.TARGET_NAME}}
       {{.TARGET_NAME}} -V
 

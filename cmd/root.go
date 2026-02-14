@@ -9,7 +9,9 @@ import (
 	"path/filepath"
 )
 
-var verbose int
+var (
+	verbose int
+)
 
 var rootCmd = &cobra.Command{
 	Use:     "ir owner/repo [tag]",
@@ -51,17 +53,20 @@ func onInitialize() {
 
 	configName := "install-release"
 	//viper.SetEnvPrefix("ir")
-	viper.SetConfigType("yaml")
 	viper.SetConfigName(configName)
+	viper.SetConfigType("yaml")
+
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Warnf("os.UserHomeDir err: %v", err)
 		homeDir = "."
 	}
 	log.Debugf("homeDir: %v", homeDir)
+
 	configPath := filepath.Join(homeDir, ".config")
 	log.Debugf("configPath: %v", configPath)
 	viper.AddConfigPath(configPath)
+
 	defaultBinPath := filepath.Join(homeDir, "bin")
 	log.Debugf("defaultBinPath: %v", defaultBinPath)
 	viper.SetDefault("bin", defaultBinPath)

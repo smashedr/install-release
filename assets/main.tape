@@ -31,13 +31,13 @@ Type "which bup"
 Sleep 0.5s
 Enter
 Wait
-Sleep 1.5s
+Sleep 1s
 
 Type "bup -V"
 Sleep 0.5s
 Enter
 Wait
-Sleep 1.5s
+Sleep 1s
 
 Type "ir list"
 Sleep 0.5s
