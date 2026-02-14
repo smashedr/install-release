@@ -1,4 +1,4 @@
-#define MyAppName "InstallRelease"
+#define MyAppName "Install Release"
 #define MyAppPublisher "CSSNR"
 #define MyAppURL "https://smashedr.github.io/install-release/"
 #define MyAppExeName "ir.exe"
