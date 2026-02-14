@@ -6,6 +6,7 @@
   #define MyAppVersion "0.0.1"
 #endif
 #define MyAppFileName "ir"
+#define MyDefaultDirName "install-release"
 
 [Setup]
 AppId={{77FFF241-28DE-450E-AE6F-00CD662B8DE3}
@@ -18,7 +19,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 ;Compression=lzma
 ;SolidCompression=yes
-DefaultDirName={autopf}\{#MyAppName}
+DefaultDirName={autopf}\{#MyDefaultDirName}
 DefaultGroupName={#MyAppName}
 ;DisableDirPage=yes
 ;DisableProgramGroupPage=yes

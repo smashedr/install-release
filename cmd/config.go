@@ -20,6 +20,7 @@ var configCmd = &cobra.Command{
 		file := viper.ConfigFileUsed()
 		log.Infof("viper.ConfigFileUsed(): %v", file)
 		edit := editor.NewEditor()
+		styles.PrintKV("Opening", file)
 		if err := edit.Launch(file); err != nil {
 			log.Fatal(err)
 		}
