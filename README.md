@@ -97,7 +97,13 @@ Install the latest release.
 ir owner/repo
 ```
 
-Install a specific version.
+Include pre-releases.
+
+```shell
+ir owner/repo --pre
+```
+
+Install a specific version/tag.
 
 ```shell
 ir owner/repo v4.2.0
@@ -136,7 +142,19 @@ ir list
 Remove an app.
 
 ```shell
+ir remove
+```
+
+Remove an app by name.
+
+```shell
 ir remove name
+```
+
+Edit the settings.
+
+```shell
+ir config
 ```
 
 [![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)

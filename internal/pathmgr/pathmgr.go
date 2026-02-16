@@ -12,7 +12,7 @@ func IsDirInPath(dirPath string) (found bool, err error) {
 	log.Debug("IsDirInPath", "dirPath", dirPath)
 
 	// NOTE: Determine how to handle PATH in DOCKER
-	if os.Getenv("DOCKER") != "true" {
+	if os.Getenv("DOCKER") == "true" {
 		log.Infof("IsDirInPath is Disabled in DOCKER")
 		return true, nil
 	}

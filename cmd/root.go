@@ -36,12 +36,18 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(onInitialize)
-	rootCmd.Flags().StringP("asset", "a", "", "asset name to download")
-	rootCmd.Flags().StringP("name", "n", "", "binary file name to use")
-	rootCmd.Flags().BoolP("yes", "y", false, "answer yes to prompts")
+	rootCmd.PersistentFlags().StringP("asset", "a", "", "asset name to download")
+	_ = viper.BindPFlag("asset", rootCmd.PersistentFlags().Lookup("asset"))
+	rootCmd.PersistentFlags().StringP("name", "n", "", "binary file name to use")
+	_ = viper.BindPFlag("name", rootCmd.PersistentFlags().Lookup("name"))
+	rootCmd.PersistentFlags().BoolP("pre", "p", false, "include pre-releases")
+
+	rootCmd.PersistentFlags().BoolP("yes", "y", false, "answer yes to prompts")
+	_ = viper.BindPFlag("yes", rootCmd.PersistentFlags().Lookup("yes"))
 
 	rootCmd.PersistentFlags().StringP("bin", "b", "", "bin path to use")
 	_ = viper.BindPFlag("bin", rootCmd.PersistentFlags().Lookup("bin"))
+
 	rootCmd.PersistentFlags().CountVarP(&verbose, "verbose", "v", "verbose output (-vvv debug)")
 
 	rootCmd.Flags().BoolP("version", "V", false, "show installed version")
@@ -52,9 +58,13 @@ func onInitialize() {
 	log.Info("Log Level", "verbose", verbose)
 
 	configName := "install-release"
-	//viper.SetEnvPrefix("ir")
+	configType := "yaml"
 	viper.SetConfigName(configName)
-	viper.SetConfigType("yaml")
+	viper.SetConfigType(configType)
+	viper.SetEnvPrefix("ir")
+	viper.AutomaticEnv()
+
+	viper.SetDefault("yes", false)
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -76,7 +86,7 @@ func onInitialize() {
 		if err := os.MkdirAll(configPath, 0755); err != nil {
 			log.Fatalf("Creating config directory: %v: %v", configPath, err)
 		}
-		configFile := filepath.Join(configPath, configName+".yaml")
+		configFile := filepath.Join(configPath, fmt.Sprintf("%s.%s", configName, configType))
 		log.Infof("Config File: %v", configFile)
 		viper.SetConfigFile(configFile)
 		if err := viper.SafeWriteConfigAs(configFile); err != nil {
