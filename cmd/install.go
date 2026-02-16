@@ -32,13 +32,13 @@ var archAliases = map[string][]string{
 
 func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	cmd.SilenceUsage = true // set here so subcommands do not silence usage
-	var err error
 	binPath := viper.GetString("bin")
 	log.Debug("runInstall", "args", args, "binPath", binPath)
-	skipPrompts, _ := cmd.Flags().GetBool("yes")
-	assetName, _ := cmd.Flags().GetString("asset")
-	destName, _ := cmd.Flags().GetString("name")
-	log.Info("Flags:", "skipPrompts", skipPrompts, "assetName", assetName, "destName", destName)
+	skipPrompts := viper.GetBool("yes")
+	assetName := viper.GetString("asset")
+	destName := viper.GetString("name")
+	preRelease, _ := cmd.Flags().GetBool("pre")
+	log.Info("Flags:", "skipPrompts", skipPrompts, "assetName", assetName, "destName", destName, "preRelease", preRelease)
 
 	if len(args) < 1 {
 		_ = cmd.Help()
@@ -48,7 +48,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	owner, repo, err := parseRepository(args[0])
 	if err != nil {
 		_ = cmd.Help()
-		log.Fatal(err)
+		return err
 	}
 
 	tag := "latest"
@@ -61,7 +61,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	client := getClient()
 
-	release, err := getRelease(client, owner, repo, tag)
+	release, err := getRelease(client, owner, repo, tag, preRelease)
 	if err != nil {
 		return fmt.Errorf("get release error: %w", err)
 	}
@@ -69,7 +69,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		log.Debugf("release: %v", release)
 	}
 
-	styles.PrintKV("Version:", release.GetTagName())
+	styles.PrintKV("Version:", fmt.Sprintf("%s (%s)", release.GetTagName(), release.GetName()))
 
 	// Asset
 	var asset *github.ReleaseAsset
@@ -198,7 +198,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 			}).
 			Value(&destName)
 		if err := form.Run(); err != nil {
-			log.Fatalf("Prompt failed %v", err)
+			return err
 		}
 		log.Debugf("4 destName: %v", destName)
 	}
@@ -380,11 +380,13 @@ func getClient() *github.Client {
 	return github.NewClient(httpClient)
 }
 
-func getRelease(client *github.Client, owner, repo, tag string) (*github.RepositoryRelease, error) {
+func getRelease(client *github.Client, owner, repo, tag string, pre bool) (*github.RepositoryRelease, error) {
 	ctx := context.Background()
 	var release *github.RepositoryRelease
 	var err error
-	if tag == "" || tag == "latest" {
+	if pre {
+		release, err = getLatestRelease(client, owner, repo)
+	} else if tag == "" || tag == "latest" {
 		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
 	} else {
 		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
@@ -393,6 +395,19 @@ func getRelease(client *github.Client, owner, repo, tag string) (*github.Reposit
 		return nil, fmt.Errorf("get release error: %w", err)
 	}
 	return release, nil
+}
+
+func getLatestRelease(client *github.Client, owner, repo string) (*github.RepositoryRelease, error) {
+	ctx := context.Background()
+	releases, _, err := client.Repositories.ListReleases(ctx, owner, repo, &github.ListOptions{PerPage: 1})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(releases) > 0 {
+		return releases[0], nil
+	}
+	return nil, nil
 }
 
 func ensureWinExt(destName string) string {

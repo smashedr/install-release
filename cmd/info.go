@@ -13,14 +13,14 @@ import (
 )
 
 var infoCmd = &cobra.Command{
-	Use:     "info [owner/repo]",
+	Use:     "info [owner/repo] [tag]",
 	Aliases: []string{"i", "in", "inf"},
 	Short:   "Show app or package information",
 	Long:    "Show app or package information.",
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := viper.GetString("bin")
-		//sumFlag, _ := cmd.Flags().GetBool("summary")
-		log.Debug("infoCmd", "args", args, "binPath", binPath)
+		preRelease, _ := cmd.Flags().GetBool("pre")
+		log.Debug("infoCmd", "args", args, "binPath", binPath, "preRelease", preRelease)
 
 		if len(args) >= 1 && strings.Contains(args[0], "/") {
 			owner, repo, err := parseRepository(args[0])
@@ -28,9 +28,13 @@ var infoCmd = &cobra.Command{
 				_ = cmd.Help()
 				log.Fatal(err)
 			}
+			tag := "latest"
+			if len(args) > 1 {
+				tag = args[1]
+			}
 			log.Info("Repository", "owner", owner, "repo", repo)
 			client := getClient()
-			release, err := getRelease(client, owner, repo, "")
+			release, err := getRelease(client, owner, repo, tag, preRelease)
 			if err != nil {
 				log.Fatalf("Error getting release: %v", err)
 			}

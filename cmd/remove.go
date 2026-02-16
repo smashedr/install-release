@@ -20,8 +20,8 @@ var removeCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		binPath := viper.GetString("bin")
 		log.Debug("removeCmd", "args", args, "binPath", binPath)
-		//noConfirm, _ := cmd.Flags().GetBool("yes")
-		//log.Debug("Flags", "noConfirm", noConfirm)
+		//skipPrompts := viper.GetBool("yes")
+		//log.Info("Flags:", "skipPrompts", skipPrompts)
 
 		var name string
 		var err error
