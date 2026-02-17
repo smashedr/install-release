@@ -59,7 +59,7 @@ Install the latest release.
 ir owner/repo
 ```
 
-Include pre-releases.
+Include the latest pre-releases.
 
 ```shell
 ir owner/repo --pre
@@ -68,7 +68,18 @@ ir owner/repo --pre
 Install a specific version/tag.
 
 ```shell
-ir owner/repo v4.2.0
+ir owner/repo v1.0.0
+```
+
+Install using many formats:
+
+```shell
+ir owner repo
+ir owner repo tag
+ir owner/repo
+ir owner/repo tag
+ir owner/repo:tag
+ir owner/repo@tag
 ```
 
 Skip the asset and name prompts.
@@ -77,10 +88,10 @@ Skip the asset and name prompts.
 ir owner/repo -y
 ```
 
-Set the name and asset programmatically.
+Set the asset and name inline.
 
 ```shell
-ir owner/repo -n name -a name_asset.zip
+ir owner/repo -n name -a asset_name.zip
 ```
 
 Install to a different bin directory.

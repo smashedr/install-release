@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/log"
 	"github.com/dustin/go-humanize"
+	"github.com/google/go-github/v58/github"
 	"github.com/smashedr/install-release/internal/styles"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -23,16 +24,12 @@ var infoCmd = &cobra.Command{
 		log.Debug("infoCmd", "args", args, "binPath", binPath, "preRelease", preRelease)
 
 		if len(args) >= 1 && strings.Contains(args[0], "/") {
-			owner, repo, err := parseRepository(args[0])
+			owner, repo, tag, err := parseRepository(args)
 			if err != nil {
 				_ = cmd.Help()
 				log.Fatal(err)
 			}
-			tag := "latest"
-			if len(args) > 1 {
-				tag = args[1]
-			}
-			log.Info("Repository", "owner", owner, "repo", repo)
+			log.Info("Repository", "owner", owner, "repo", repo, "tag", tag)
 			client := getClient()
 			release, err := getRelease(client, owner, repo, tag, preRelease)
 			if err != nil {
@@ -41,19 +38,7 @@ var infoCmd = &cobra.Command{
 			if verbose >= 3 {
 				log.Debugf("%v", release)
 			}
-
-			releaseTime := release.GetCreatedAt().Time // Timestamp → time.Time
-			formattedDate := releaseTime.Format("15:04 on 2 Jan 2006")
-
-			rows := [][]string{
-				{"Tag", release.GetTagName()},
-				{"Name", release.GetName()},
-				{"Date", formattedDate},
-				{"Time", humanize.Time(releaseTime)},
-				{"Author", release.GetAuthor().GetLogin()},
-				{"Assets", strconv.Itoa(len(release.Assets))},
-			}
-			styles.RenderTable(rows, "Info", "Details")
+			renderReleaseTable(release)
 			return
 		}
 
@@ -72,6 +57,23 @@ var infoCmd = &cobra.Command{
 		fmt.Println(styles.Command.Render("ir info owner/repo"))
 
 	},
+}
+
+func renderReleaseTable(release *github.RepositoryRelease) {
+	releaseTime := release.GetCreatedAt().Time // Timestamp → time.Time
+	formattedDate := releaseTime.Format("15:04 on 2 Jan 2006")
+
+	rows := [][]string{
+		{"Name", release.GetName()},
+		{"Tag", release.GetTagName()},
+		{"Prerelease", strconv.FormatBool(release.GetPrerelease())},
+		{"Date", formattedDate},
+		{"Time", humanize.Time(releaseTime)},
+		{"Author", release.GetAuthor().GetLogin()},
+		{"Assets", strconv.Itoa(len(release.Assets))},
+		//{"URL", release.GetHTMLURL()},
+	}
+	styles.RenderTable(rows, "Info", "Details")
 }
 
 func init() {
