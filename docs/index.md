@@ -91,7 +91,7 @@ ir owner/repo -y
 Set the asset and name inline.
 
 ```shell
-ir owner/repo -n name -a name_asset.zip
+ir owner/repo -n name -a asset_name.zip
 ```
 
 Install to a different bin directory.
