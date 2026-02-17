@@ -18,7 +18,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -45,19 +44,24 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		return fmt.Errorf("repository must be in format: owner/repo")
 	}
 
-	owner, repo, err := parseRepository(args[0])
+	owner, repo, tag, err := parseRepository(args)
 	if err != nil {
 		_ = cmd.Help()
 		return err
 	}
-
-	tag := "latest"
-	if len(args) > 1 {
-		tag = args[1]
-	}
+	log.Info("Repository", "owner", owner, "repo", repo, "tag", tag)
 
 	log.Info("runtime", "GOOS", runtime.GOOS, "GOARCH", runtime.GOARCH)
-	styles.PrintKV("Repository:", fmt.Sprintf("%s/%s:%s", owner, repo, tag))
+
+	tagDisplay := tag
+	if tag == "" {
+		if preRelease {
+			tagDisplay = "pre-release"
+		} else {
+			tagDisplay = "latest"
+		}
+	}
+	styles.PrintKV("Repository:", fmt.Sprintf("%s/%s:%s", owner, repo, tagDisplay))
 
 	client := getClient()
 
@@ -69,7 +73,8 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		log.Debugf("release: %v", release)
 	}
 
-	styles.PrintKV("Version:", fmt.Sprintf("%s (%s)", release.GetTagName(), release.GetName()))
+	//styles.PrintKV("Version:", fmt.Sprintf("%s (%s)", release.GetTagName(), release.GetName()))
+	renderReleaseTable(release)
 
 	// Asset
 	var asset *github.ReleaseAsset
@@ -384,12 +389,15 @@ func getRelease(client *github.Client, owner, repo, tag string, pre bool) (*gith
 	ctx := context.Background()
 	var release *github.RepositoryRelease
 	var err error
-	if pre {
-		release, err = getLatestRelease(client, owner, repo)
-	} else if tag == "" || tag == "latest" {
-		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
-	} else {
+	if tag != "" {
+		log.Debugf("client.Repositories.GetReleaseByTag: %v", tag)
 		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
+	} else if pre {
+		log.Debugf("GetLatestRelease - Including Pre-Releases")
+		release, err = getLatestRelease(client, owner, repo)
+	} else {
+		log.Debugf("client.Repositories.GetLatestRelease")
+		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("get release error: %w", err)
@@ -403,10 +411,10 @@ func getLatestRelease(client *github.Client, owner, repo string) (*github.Reposi
 	if err != nil {
 		return nil, err
 	}
-
 	if len(releases) > 0 {
 		return releases[0], nil
 	}
+	// TODO: Consider returning an error here...
 	return nil, nil
 }
 
@@ -420,12 +428,48 @@ func ensureWinExt(destName string) string {
 	return destName
 }
 
-func parseRepository(repository string) (owner, repo string, err error) {
-	var repoPattern = regexp.MustCompile(`^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$`)
-
-	if !repoPattern.MatchString(repository) {
-		return "", "", fmt.Errorf("repository must be in format: owner/repo")
+func parseRepository(args []string) (owner, repo, tag string, err error) {
+	const help = "repository must be in format: owner/repo[:tag]"
+	log.Debugf("parseRepository: %v", len(args))
+	switch len(args) {
+	case 0:
+		return "", "", "", fmt.Errorf(help)
+	case 1:
+		repository := args[0]
+		if strings.Contains(repository, ":") {
+			split := strings.Split(repository, ":")
+			repository = split[0]
+			tag = split[1]
+		} else if strings.Contains(repository, "@") {
+			split := strings.Split(repository, "@")
+			repository = split[0]
+			tag = split[1]
+		}
+		split := strings.Split(repository, "/")
+		if len(split) != 2 {
+			return "", "", "", fmt.Errorf(help)
+		}
+		owner = split[0]
+		repo = split[1]
+	case 2:
+		if strings.Contains(args[0], "/") {
+			split := strings.Split(args[0], "/")
+			owner = split[0]
+			repo = split[1]
+			tag = args[1]
+		} else {
+			owner = args[0]
+			repo = args[1]
+		}
+	default:
+		owner = args[0]
+		repo = args[1]
+		tag = args[2]
 	}
-	split := strings.Split(repository, "/")
-	return split[0], split[1], nil
+
+	if owner == "" || repo == "" {
+		log.Infof("owner/repo are blank")
+		return "", "", "", fmt.Errorf(help)
+	}
+	return
 }
