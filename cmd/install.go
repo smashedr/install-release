@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/bartventer/httpcache"
 	_ "github.com/bartventer/httpcache/store/fscache"
@@ -429,11 +430,11 @@ func ensureWinExt(destName string) string {
 }
 
 func parseRepository(args []string) (owner, repo, tag string, err error) {
-	const help = "repository must be in format: owner/repo[:tag]"
+	helpErr := errors.New("repository must be in format: owner/repo[:tag]")
 	log.Debugf("parseRepository: %v", len(args))
 	switch len(args) {
 	case 0:
-		return "", "", "", fmt.Errorf(help)
+		return "", "", "", helpErr
 	case 1:
 		repository := args[0]
 		if strings.Contains(repository, ":") {
@@ -447,7 +448,7 @@ func parseRepository(args []string) (owner, repo, tag string, err error) {
 		}
 		split := strings.Split(repository, "/")
 		if len(split) != 2 {
-			return "", "", "", fmt.Errorf(help)
+			return "", "", "", helpErr
 		}
 		owner = split[0]
 		repo = split[1]
@@ -469,7 +470,7 @@ func parseRepository(args []string) (owner, repo, tag string, err error) {
 
 	if owner == "" || repo == "" {
 		log.Infof("owner/repo are blank")
-		return "", "", "", fmt.Errorf(help)
+		return "", "", "", helpErr
 	}
 	return
 }
