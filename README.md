@@ -21,7 +21,7 @@
 # Install Release
 
 [![Homebrew](https://img.shields.io/badge/homebrew-gray?style=flat-square&logo=homebrew)](#homebrew)
-[![Bash](https://img.shields.io/badge/bash-gray?style=flat-square&logo=stackedit&logoColor=white)](#bash)
+[![Bash](https://img.shields.io/badge/bash-gray?style=flat-square&logo=educative&logoColor=white)](#bash)
 [![Powershell](https://img.shields.io/badge/powershell-gray?style=flat-square&logo=cashapp&logoColor=lightblue)](#powershell)
 [![Go](https://img.shields.io/badge/source-gray?style=flat-square&logo=go)](#source)
 [![Docker Installer](https://img.shields.io/badge/docker_installer-gray?style=flat-square&logo=docker)](#docker)
@@ -113,9 +113,10 @@ Install using many formats:
 
 ```shell
 ir owner repo
-ir owner repo tag
 ir owner/repo
+ir owner repo tag
 ir owner/repo tag
+ir owner/repo/tag
 ir owner/repo:tag
 ir owner/repo@tag
 ```
@@ -208,7 +209,7 @@ If you run into any issues or need help getting started, please do one of the fo
 
 [![Features](https://img.shields.io/badge/features-brightgreen?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/smashedr/install-release/issues/new?template=1-feature.yaml)
 [![Issues](https://img.shields.io/badge/issues-red?style=for-the-badge&logo=southwestairlines&logoColor=white)](https://github.com/smashedr/install-release/issues)
-[![Discussions](https://img.shields.io/badge/discussions-blue?style=for-the-badge&logo=theconversation&logoColor=white)](https://github.com/smashedr/install-release/discussions)
+[![Discussions](https://img.shields.io/badge/discussions-blue?style=for-the-badge&logo=livechat&logoColor=white)](https://github.com/smashedr/install-release/discussions)
 [![Discord](https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/wXy6m2X8wY)
 
 # Contributing
@@ -221,3 +222,11 @@ and [additional](https://cssnr.com/) open source projects.
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/cssnr)
 
 For a full list of current projects visit: [https://cssnr.github.io/](https://cssnr.github.io/)
+
+<a href="https://github.com/smashedr/install-release/stargazers">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=top-left&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=top-left" />
+ </picture>
+</a>

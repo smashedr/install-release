@@ -75,9 +75,10 @@ Install using many formats:
 
 ```shell
 ir owner repo
-ir owner repo tag
 ir owner/repo
+ir owner repo tag
 ir owner/repo tag
+ir owner/repo/tag
 ir owner/repo:tag
 ir owner/repo@tag
 ```

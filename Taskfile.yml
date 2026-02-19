@@ -18,18 +18,23 @@ tasks:
 
   lint:
     desc: Lint
-    cmd: |
-      prettier --check .
-      yamllint -c .github/yamllint.yaml .
-      golangci-lint run
-      actionlint -shellcheck="-e SC2129"
-      hadolint Dockerfile
+    cmds:
+      - prettier --check .
+      - yamllint -c .github/yamllint.yaml .
+      - golangci-lint run
+      - actionlint -shellcheck="-e SC2129"
+      - hadolint Dockerfile
+      - task: pslint
+
+  pslint:
+    platforms: [windows]
+    cmd: powershell -Command "Invoke-ScriptAnalyzer -Path scripts -Recurse"
 
   clean:
     desc: Clean All
-    cmd: |
-      rm -rf dist/client
-      rm -rf out
+    cmds:
+      - rm -rf dist/client
+      - rm -rf out
 
   build:
     desc: GoReleaser Build
@@ -41,9 +46,9 @@ tasks:
 
   docs:
     desc: Zensical Docs
-    cmd: |
-      rm -rf .cache
-      zensical serve --open
+    cmds:
+      - rm -rf .cache
+      - zensical serve --open
 
   inno:
     aliases: [setup]
@@ -64,21 +69,21 @@ tasks:
     vars:
       TARGET_NAME: '{{.EXE}}{{if eq OS "windows"}}.exe{{end}}'
       TARGET_DIR: '${HOME}{{if eq OS "windows"}}\bin\{{else}}/bin/{{end}}{{.TARGET_NAME}}'
-    cmd: |
-      go build -o {{.TARGET_NAME}}
-      echo "Name: {{.TARGET_NAME}}"
-      mv "{{.TARGET_NAME}}" "{{.TARGET_DIR}}"
-      echo "Path: {{.TARGET_DIR}}"
-      which {{.TARGET_NAME}}
-      {{.TARGET_NAME}} -V
+    cmds:
+      - go build -o "{{.TARGET_NAME}}"
+      - echo "Name {{.TARGET_NAME}}"
+      - mv "{{.TARGET_NAME}}" "{{.TARGET_DIR}}"
+      - echo Path "{{.TARGET_DIR}}"
+      - which "{{.TARGET_NAME}}"
+      - "{{.TARGET_NAME}} -V"
 
   vhs:*:
     desc: Create VHS Tape
     vars:
       TAPE_FILE: '{{index .MATCH 0 | default "demo"}}'
-    cmd: |
-      echo "Creating Tape - assets/{{.TAPE_FILE}}.tape"
-      vhs "assets/{{.TAPE_FILE}}.tape"
+    cmds:
+      - echo "Creating Tape assets/{{.TAPE_FILE}}.tape"
+      - vhs "assets/{{.TAPE_FILE}}.tape"
 
   build:*:*:
     desc: Build OS:ARCH
@@ -91,6 +96,6 @@ tasks:
           enum: [darwin, linux, windows]
         - name: ARCH
           enum: [amd64, arm64, "386"]
-    cmd: |
-      echo "Building: {{.OS}} / {{.ARCH}}"
-      GOOS={{.OS}} GOARCH={{.ARCH}} goreleaser build --snapshot --clean --single-target {{.CLI_ARGS}}
+    cmds:
+      - echo "Building {{.OS}} / {{.ARCH}}"
+      - GOOS={{.OS}} GOARCH={{.ARCH}} goreleaser build --snapshot --clean --single-target {{.CLI_ARGS}}

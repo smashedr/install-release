@@ -62,7 +62,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 			tagDisplay = "latest"
 		}
 	}
-	styles.PrintKV("Repository:", fmt.Sprintf("%s/%s:%s", owner, repo, tagDisplay))
+	styles.PrintKV("Repository", fmt.Sprintf("%s/%s:%s", owner, repo, tagDisplay))
 
 	client := getClient()
 
@@ -74,7 +74,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		log.Debugf("release: %v", release)
 	}
 
-	//styles.PrintKV("Version:", fmt.Sprintf("%s (%s)", release.GetTagName(), release.GetName()))
+	//styles.PrintKV("Version", fmt.Sprintf("%s (%s)", release.GetTagName(), release.GetName()))
 	renderReleaseTable(release)
 
 	// Asset
@@ -114,7 +114,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	log.Infof("id: %v", asset.GetID())
 	log.Infof("url: %v", asset.GetBrowserDownloadURL())
-	styles.PrintKV("Asset Name:", asset.GetName())
+	styles.PrintKV("Asset Name", asset.GetName())
 
 	rc, _, err := client.Repositories.DownloadReleaseAsset(
 		context.Background(), owner, repo, asset.GetID(), http.DefaultClient,
@@ -223,7 +223,13 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	// Move it to binPath
 	destPath := filepath.Join(binPath, destName)
-	styles.PrintKV("Destination:", destPath)
+	log.Infof("destPath: %v", destPath)
+	destDisplay := destPath
+	log.Debugf("DOCKER: %v", os.Getenv("DOCKER"))
+	if os.Getenv("DOCKER") == "true" {
+		destDisplay = fmt.Sprintf("-v <bin>/%s", binPath)
+	}
+	styles.PrintKV("Destination", destDisplay)
 	if err := os.Rename(binaryFilePath, destPath); err != nil {
 		log.Infof("os.Rename failed (copying): %v", err)
 		// Read the file content
@@ -245,7 +251,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		log.Warnf("Bin directory not in PATH: %v", binPath)
 	}
 
-	styles.PrintKV("Installed:", destName)
+	styles.PrintKV("Installed", destName)
 	return nil
 }
 
@@ -430,22 +436,26 @@ func ensureWinExt(destName string) string {
 }
 
 func parseRepository(args []string) (owner, repo, tag string, err error) {
-	helpErr := errors.New("repository must be in format: owner/repo[:tag]")
-	log.Debugf("parseRepository: %v", len(args))
+	helpErr := errors.New("repository format: owner/repo[:tag]")
+	log.Debugf("parseRepository %v: %v", len(args), args)
 	switch len(args) {
 	case 0:
 		return "", "", "", helpErr
 	case 1:
 		repository := args[0]
-		if strings.Contains(repository, ":") {
-			split := strings.Split(repository, ":")
-			repository = split[0]
-			tag = split[1]
-		} else if strings.Contains(repository, "@") {
-			split := strings.Split(repository, "@")
-			repository = split[0]
-			tag = split[1]
+		// Check for :tag @tag /tag
+		if idx := strings.IndexAny(args[0], ":@"); idx != -1 {
+			log.Debugf("idx: %v", idx)
+			repository = args[0][:idx]
+			tag = args[0][idx+1:]
+		} else if strings.Count(args[0], "/") == 2 {
+			split := strings.Split(args[0], "/")
+			if split[2] != "" {
+				repository = split[0] + "/" + split[1]
+				tag = split[2]
+			}
 		}
+		// Set owner/repo
 		split := strings.Split(repository, "/")
 		if len(split) != 2 {
 			return "", "", "", helpErr

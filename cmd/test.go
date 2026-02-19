@@ -42,7 +42,7 @@ var testCmd = &cobra.Command{
 		//}
 		//fmt.Print(strings.TrimLeft(out, "\n"))
 		//
-		//styles.PrintKV("Release URL:", release.GetHTMLURL())
+		//styles.PrintKV("Release URL", release.GetHTMLURL())
 		//return
 
 		homeDir, err := os.UserHomeDir()
