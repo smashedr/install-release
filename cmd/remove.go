@@ -69,7 +69,7 @@ var removeCmd = &cobra.Command{
 		if err := os.Remove(path); err != nil {
 			log.Fatalf("prompt error: %v", err)
 		}
-		styles.PrintKV("Removed:", name)
+		styles.PrintKV("Removed", name)
 	},
 }
 

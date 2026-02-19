@@ -37,11 +37,11 @@ var pathCmd = &cobra.Command{
 		switch command {
 		case "a", "ad", "add":
 			// NOTE: Add output here and remove from AddDirToPath
-			added, ret, err := pathmgr.AddDirToPath(path, 1, 0)
+			added, err := pathmgr.AddDirToPath(path)
 			if err != nil {
 				log.Fatalf("pathmgr.AddDirToPath: %v", err)
 			}
-			log.Info("AddDirToPath", "added", added, "ret", ret, "err", err)
+			log.Info("AddDirToPath", "added", added)
 		case "r", "re", "rem", "remove":
 			log.Fatal("INOP: The remove command is not yet functional...")
 		case "c", "ch", "chk", "check":

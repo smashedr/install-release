@@ -49,9 +49,9 @@ var infoCmd = &cobra.Command{
 			log.Warn(err)
 		}
 
-		styles.PrintKV("Executable:", executable)
-		styles.PrintKV("Config Used:", viper.ConfigFileUsed())
-		styles.PrintKV("Bin Path:", binPath)
+		styles.PrintKV("Executable", executable)
+		styles.PrintKV("Config Used", viper.ConfigFileUsed())
+		styles.PrintKV("Bin Path", binPath)
 
 		fmt.Printf("To get package info, run:\n")
 		fmt.Println(styles.Command.Render("ir info owner/repo"))
