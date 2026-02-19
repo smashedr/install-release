@@ -3,11 +3,11 @@
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/install-release)](https://github.com/smashedr/install-release/pkgs/container/install-release)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/smashedr/install-release?logo=go&logoColor=white&label=go)](https://github.com/smashedr/install-release/blob/master/go.mod)
 [![Deployment Docs](https://img.shields.io/github/deployments/smashedr/install-release/docs?logo=materialformkdocs&logoColor=white&label=docs)](https://github.com/smashedr/install-release/deployments/docs)
-[![Deployment Preview](https://img.shields.io/github/deployments/smashedr/install-release/preview?logo=materialformkdocs&logoColor=white&label=preview)](https://github.com/smashedr/install-release/deployments/preview)
-[![Workflow Release](https://img.shields.io/github/actions/workflow/status/smashedr/install-release/release.yaml?logo=testcafe&logoColor=white&label=release)](https://github.com/smashedr/install-release/actions/workflows/release.yaml)
-[![Workflow Lint](https://img.shields.io/github/actions/workflow/status/smashedr/install-release/lint.yaml?logo=testcafe&logoColor=white&label=lint)](https://github.com/smashedr/install-release/actions/workflows/lint.yaml)
+[![Deployment Preview](https://img.shields.io/github/deployments/smashedr/install-release/preview?logo=labex&logoColor=white&label=preview)](https://github.com/smashedr/install-release/deployments/preview)
+[![Workflow Release](https://img.shields.io/gi/actions/workflow/status/smashedr/install-release/release.yaml?logo=norton&logoColor=white&label=release)](https://github.com/smashedr/install-release/actions/workflows/release.yaml)
+[![Workflow Lint](https://img.shields.io/github/actions/workflow/status/smashedr/install-release/lint.yaml?logo=norton&logoColor=white&label=lint)](https://github.com/smashedr/install-release/actions/workflows/lint.yaml)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/install-release?logo=listenhub&label=updated)](https://github.com/smashedr/install-release/pulse)
-[![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/install-release?logo=buffer&label=repo%20size)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
+[![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/install-release?logo=googlecloudstorage&logoColor=white&label=repo%20size)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
 [![GitHub Top Language](https://img.shields.io/github/languages/top/smashedr/install-release?logo=devbox)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
 [![GitHub Contributors](https://img.shields.io/github/contributors-anon/smashedr/install-release?logo=southwestairlines)](https://github.com/smashedr/install-release/graphs/contributors)
 [![GitHub Issues](https://img.shields.io/github/issues/smashedr/install-release?logo=codeforces&logoColor=white)](https://github.com/smashedr/install-release/issues)
@@ -87,7 +87,7 @@ docker run --rm -itv ~/bin:/out ghcr.io/smashedr/ir:latest -b /out smashedr/inst
 
 _Note: Docker requires you to mount the target bin directory._
 
-[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
+[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=quicklook)](https://smashedr.github.io/install-release/)
 
 ## Usage
 
@@ -169,7 +169,7 @@ Edit the settings.
 ir config
 ```
 
-[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://smashedr.github.io/install-release/)
+[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=quicklook)](https://smashedr.github.io/install-release/)
 
 # Development
 
@@ -225,8 +225,8 @@ For a full list of current projects visit: [https://cssnr.github.io/](https://cs
 
 <a href="https://github.com/smashedr/install-release/stargazers">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=top-left&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right" />
  </picture>
 </a>

@@ -66,9 +66,12 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	client := getClient()
 
-	release, err := getRelease(client, owner, repo, tag, preRelease)
+	release, err := getRelease(client, owner, repo, tag, preRelease, skipPrompts)
 	if err != nil {
 		return fmt.Errorf("get release error: %w", err)
+	}
+	if release == nil {
+		return fmt.Errorf("no release found")
 	}
 	if verbose >= 3 {
 		log.Debugf("release: %v", release)
@@ -392,7 +395,7 @@ func getClient() *github.Client {
 	return github.NewClient(httpClient)
 }
 
-func getRelease(client *github.Client, owner, repo, tag string, pre bool) (*github.RepositoryRelease, error) {
+func getRelease(client *github.Client, owner, repo, tag string, pre, skip bool) (*github.RepositoryRelease, error) {
 	ctx := context.Background()
 	var release *github.RepositoryRelease
 	var err error
@@ -400,11 +403,14 @@ func getRelease(client *github.Client, owner, repo, tag string, pre bool) (*gith
 		log.Debugf("client.Repositories.GetReleaseByTag: %v", tag)
 		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
 	} else if pre {
-		log.Debugf("GetLatestRelease - Including Pre-Releases")
+		log.Debugf("GetLatestRelease")
 		release, err = getLatestRelease(client, owner, repo)
-	} else {
+	} else if skip {
 		log.Debugf("client.Repositories.GetLatestRelease")
 		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
+	} else {
+		log.Debugf("chooseRelease")
+		release, err = chooseRelease(client, owner, repo, 30)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("get release error: %w", err)
@@ -413,16 +419,52 @@ func getRelease(client *github.Client, owner, repo, tag string, pre bool) (*gith
 }
 
 func getLatestRelease(client *github.Client, owner, repo string) (*github.RepositoryRelease, error) {
-	ctx := context.Background()
-	releases, _, err := client.Repositories.ListReleases(ctx, owner, repo, &github.ListOptions{PerPage: 1})
+	releases, err := getReleases(client, owner, repo, 1)
 	if err != nil {
 		return nil, err
 	}
-	if len(releases) > 0 {
-		return releases[0], nil
+	if len(releases) == 0 {
+		return nil, nil
 	}
-	// TODO: Consider returning an error here...
-	return nil, nil
+	return releases[0], nil
+}
+
+func getReleases(client *github.Client, owner, repo string, number int) ([]*github.RepositoryRelease, error) {
+	ctx := context.Background()
+	releases, _, err := client.Repositories.ListReleases(ctx, owner, repo, &github.ListOptions{PerPage: number})
+	if err != nil {
+		return nil, err
+	}
+	return releases, nil
+}
+
+func chooseRelease(client *github.Client, owner, repo string, number int) (*github.RepositoryRelease, error) {
+	releases, err := getReleases(client, owner, repo, number)
+	if err != nil {
+		return nil, fmt.Errorf("error getting releases: %w", err)
+	}
+
+	log.Debugf("releases: %v", len(releases))
+	var result1 int
+	options := make([]huh.Option[int], len(releases))
+	for i, release := range releases {
+		options[i] = huh.NewOption(release.GetTagName(), i)
+	}
+	form := huh.NewSelect[int]().
+		Title("Select a version:").
+		Options(options...).
+		Value(&result1)
+
+	err = form.Run()
+	if err != nil {
+		return nil, fmt.Errorf("prompt failed: %w", err)
+	}
+	log.Debugf("result1: %v", result1)
+
+	chosen := releases[result1]
+	log.Debugf("release: %v", chosen)
+	log.Debugf("tag: %v", chosen.GetTagName())
+	return chosen, nil
 }
 
 func ensureWinExt(destName string) string {

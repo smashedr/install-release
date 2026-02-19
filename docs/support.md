@@ -48,4 +48,12 @@ From here you can contact me directly, `Shane@111150265075298304`.
 
 More information available at: [https://cssnr.com/](https://cssnr.com/)
 
-[![Image title](https://cdn.prod.website-files.com/5c14e387dab576fe667689cf/670f5a01c01ea9191809398c_support_me_on_kofi_blue.png){ width="360" }](https://ko-fi.com/cssnr)
+[![Support on Ko-fi](https://cdn.prod.website-files.com/5c14e387dab576fe667689cf/670f5a01c01ea9191809398c_support_me_on_kofi_blue.png){ width="360" }](https://ko-fi.com/cssnr)
+
+<a href="https://github.com/smashedr/install-release/stargazers">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right" />
+ </picture>
+</a>
