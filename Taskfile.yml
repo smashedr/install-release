@@ -24,6 +24,7 @@ tasks:
       - golangci-lint run
       - actionlint -shellcheck="-e SC2129"
       - hadolint Dockerfile
+      - shellcheck scripts/install.sh
       - task: pslint
 
   pslint:
@@ -59,11 +60,11 @@ tasks:
   pathmgr:
     desc: Download PathMgr
     status: [test -d dist/PathMgr]
-    cmd: |
-      mkdir -p dist
-      wget https://github.com/Bill-Stewart/PathMgr/releases/download/v2.0.0/PathMgr-2.0.0.zip -O dist/pathmgr.zip
-      unzip dist/pathmgr.zip -d dist/PathMgr
-      rm dist/pathmgr.zip
+    cmds:
+      - mkdir -p dist
+      - wget https://github.com/Bill-Stewart/PathMgr/releases/download/v2.0.0/PathMgr-2.0.0.zip -O dist/pathmgr.zip
+      - unzip dist/pathmgr.zip -d dist/PathMgr
+      - rm dist/pathmgr.zip
 
   install:
     vars:

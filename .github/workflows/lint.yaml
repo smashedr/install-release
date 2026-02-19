@@ -74,13 +74,13 @@ jobs:
         with:
           dockerfile: Dockerfile
 
-      #- name: "ShellCheck"
-      #  if: ${{ !cancelled() }}
-      #  uses: ludeeus/action-shellcheck@master
-      #  env:
-      #    SHELLCHECK_OPTS: -x
-      #  with:
-      #    scandir: scripts
+      - name: "ShellCheck"
+        if: ${{ !cancelled() }}
+        uses: ludeeus/action-shellcheck@master
+        env:
+          SHELLCHECK_OPTS: -x
+        with:
+          scandir: scripts
 
   golint:
     name: "GoLint - ${{ matrix.os }}"
