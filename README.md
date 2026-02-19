@@ -4,7 +4,7 @@
 [![Go Version](https://img.shields.io/github/go-mod/go-version/smashedr/install-release?logo=go&logoColor=white&label=go)](https://github.com/smashedr/install-release/blob/master/go.mod)
 [![Deployment Docs](https://img.shields.io/github/deployments/smashedr/install-release/docs?logo=materialformkdocs&logoColor=white&label=docs)](https://github.com/smashedr/install-release/deployments/docs)
 [![Deployment Preview](https://img.shields.io/github/deployments/smashedr/install-release/preview?logo=labex&logoColor=white&label=preview)](https://github.com/smashedr/install-release/deployments/preview)
-[![Workflow Release](https://img.shields.io/gi/actions/workflow/status/smashedr/install-release/release.yaml?logo=norton&logoColor=white&label=release)](https://github.com/smashedr/install-release/actions/workflows/release.yaml)
+[![Workflow Release](https://img.shields.io/github/actions/workflow/status/smashedr/install-release/release.yaml?logo=norton&logoColor=white&label=release)](https://github.com/smashedr/install-release/actions/workflows/release.yaml)
 [![Workflow Lint](https://img.shields.io/github/actions/workflow/status/smashedr/install-release/lint.yaml?logo=norton&logoColor=white&label=lint)](https://github.com/smashedr/install-release/actions/workflows/lint.yaml)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/install-release?logo=listenhub&label=updated)](https://github.com/smashedr/install-release/pulse)
 [![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/install-release?logo=googlecloudstorage&logoColor=white&label=repo%20size)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
