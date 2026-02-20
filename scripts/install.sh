@@ -4,13 +4,12 @@
 set -e
 
 
-OWNER="smashedr"
-REPO="install-release"
+REPOSITORY="smashedr/install-release"
 EXE="ir"
-TARGET_BIN="${HOME}/bin"
+#TARGET_BIN="${HOME}/bin"
 
 
-echo "Installing: ${OWNER}/${REPO} as ${EXE}"
+echo "Installing: ${REPOSITORY} as ${EXE}"
 
 
 function fail() {
@@ -24,7 +23,7 @@ function fail() {
 }
 
 
-# OS
+## OS
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 echo "OS: ${OS}"
 case "${OS}" in
@@ -36,7 +35,7 @@ esac
 echo "OS: ${OS}"
 
 
-# ARCH
+## ARCH
 ARCH="$(uname -m)"
 echo "ARCH: ${ARCH}"
 case "${ARCH}" in
@@ -48,12 +47,14 @@ esac
 echo "ARCH: ${ARCH}"
 
 
-# FTYPE
+## FILE
 if [[ "${OS}" = "Windows" ]]; then
+    TARGET_BIN="${LOCALAPPDATA}\Microsoft\WindowsApps"
     # TODO: Confirm setting ${EXE} to .exe is not required
     FTYPE="zip"
     which unzip > /dev/null || fail "unzip is not installed"
 else
+    TARGET_BIN="${HOME}/.local/bin"
     FTYPE="tar.gz"
     which tar > /dev/null || fail "tar is not installed"
     which gzip > /dev/null || fail "gzip is not installed"
@@ -61,12 +62,12 @@ fi
 echo "FTYPE: ${FTYPE}"
 
 
-# URL
-URL="https://github.com/${OWNER}/${REPO}/releases/latest/download/${EXE}_${OS}_${ARCH}.${FTYPE}"
+## URL
+URL="https://github.com/${REPOSITORY}/releases/latest/download/${EXE}_${OS}_${ARCH}.${FTYPE}"
 echo "URL: ${URL}"
 
 
-# GET
+## GET
 GET=""
 if which curl > /dev/null; then
     GET="curl --fail -# -L"
@@ -81,7 +82,7 @@ fi
 echo "GET: ${GET}"
 
 
-# BIN
+## BIN
 echo "Target Directory: ${TARGET_BIN}"
 echo -n "Enter Path [press <enter> to accept]: "
 read -r input </dev/tty
@@ -92,7 +93,7 @@ fi
 echo "TARGET_BIN: ${TARGET_BIN}"
 
 
-# PATH
+## PATH
 if ! echo "${PATH}" | tr ':' '\n' | grep -qx "${TARGET_BIN}"; then
     echo "⚠️ Target bin NOT in PATH: ${TARGET_BIN}"
     # TODO: Add TARGET_BIN to PATH
@@ -103,7 +104,7 @@ if [[ ! -d "${TARGET_BIN}" ]]; then
 fi
 
 
-# TEMP
+## TEMP
 TEMP_DIR=$(mktemp -d -t install-release-XXXXXXXXXX)
 echo "TEMP_DIR: ${TEMP_DIR}"
 
@@ -118,7 +119,7 @@ function _execution_trap() {
 trap _execution_trap EXIT HUP INT QUIT PIPE TERM
 
 
-# DOWNLOAD
+## DOWNLOAD
 cd "${TEMP_DIR}"
 if [[ ${FTYPE} = "tar.gz" ]]; then
     bash -c "${GET} ${URL}" | tar zxf - || fail "download failed"
@@ -129,19 +130,18 @@ elif [[ ${FTYPE} = "zip" ]]; then
 fi
 
 
-# CHMOD
+## CHMOD
 TEMP_BIN="${TEMP_DIR}/${EXE}"
 echo "TEMP_BIN: ${TEMP_BIN}"
 chmod +x "${TEMP_BIN}" || fail "chmod +x failed"
-DEST="${TARGET_BIN}/${EXE}"
-echo "DEST: ${DEST}"
 
 
-# MOVE
-if ! mv "${TEMP_BIN}" "${DEST}"; then
+## MOVE
+if ! mv "${TEMP_BIN}" "${TARGET_BIN}"; then
     echo "retrying mv with sudo..."
-    sudo mv "${TEMP_BIN}" "${DEST}" || fail "sudo mv failed"
+    sudo mv "${TEMP_BIN}" "${TARGET_BIN}" || fail "sudo mv failed"
 fi
 
 
-echo "✅ Successfully Installed: ${EXE}"
+echo "✅ Installation Successful!"
+echo "To get started run: ${EXE} --help"
