@@ -60,7 +60,7 @@ brew install cssnr/tap/install-release
 #### Bash
 
 ```shell
-curl 'https://i.jpillora.com/smashedr/install-release!?as=ir' | bash
+curl 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.sh' | bash
 ```
 
 💾 Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
