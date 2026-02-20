@@ -2,6 +2,7 @@
 [![GitHub Downloads](https://img.shields.io/github/downloads/smashedr/install-release/total?logo=rolldown&logoColor=white)](https://github.com/smashedr/install-release/releases/latest)
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/install-release)](https://github.com/smashedr/install-release/pkgs/container/install-release)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/smashedr/install-release?logo=go&logoColor=white&label=go)](https://github.com/smashedr/install-release/blob/master/go.mod)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smashedr_install-release&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smashedr_install-release)
 [![Deployment Docs](https://img.shields.io/github/deployments/smashedr/install-release/docs?logo=materialformkdocs&logoColor=white&label=docs)](https://github.com/smashedr/install-release/deployments/docs)
 [![Deployment Preview](https://img.shields.io/github/deployments/smashedr/install-release/preview?logo=labex&logoColor=white&label=preview)](https://github.com/smashedr/install-release/deployments/preview)
 [![Workflow Release](https://img.shields.io/github/actions/workflow/status/smashedr/install-release/release.yaml?logo=norton&logoColor=white&label=release)](https://github.com/smashedr/install-release/actions/workflows/release.yaml)

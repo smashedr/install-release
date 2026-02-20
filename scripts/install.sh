@@ -25,6 +25,7 @@ function fail() {
 
 
 # OS
+# TODO: Confirm setting EXE to .exe is not required
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 echo "OS: ${OS}"
 case "${OS}" in
@@ -99,7 +100,7 @@ echo "GET: ${GET}"
 # BIN
 echo "Target Directory: $TARGET_BIN"
 echo -n "Enter Path [press <enter> to accept]: "
-read -r input
+read -r input </dev/tty
 if [[ -n "${input}" ]]; then
     # TODO: Sanatize TARGET_BIN
     TARGET_BIN="${input}"
@@ -153,18 +154,10 @@ echo "DEST: ${DEST}"
 
 
 # MOVE
-mv "${TEMP_BIN}" "${DEST}" || fail "move to destination failed"
-
-#OUT=$(mv "${TEMP_BIN}" "${DEST}" 2>&1)
-#STATUS=$?
-#echo "OUT: ${OUT}"
-#echo "STATUS: ${STATUS}"
-#if [[ "${STATUS}" != "0" ]]; then
-#    if [[ $OUT =~ "Permission denied" ]]; then
-#        echo "mv with sudo..."
-#        sudo mv "${TEMP_BIN}" "${DEST}" || fail "sudo mv failed"
-#    fi
-#fi
+if ! mv "${TEMP_BIN}" "${DEST}"; then
+    echo "retrying mv with sudo..."
+    sudo mv "${TEMP_BIN}" "${DEST}" || fail "sudo mv failed"
+fi
 
 
 echo "✅ Successfully Installed: ${EXE}"
