@@ -16,8 +16,8 @@ echo "Installing: ${OWNER}/${REPO} as ${EXE}"
 function fail() {
 	_ST="$?"
 	echo "fail _ST: ${_ST}"
-	echo "⛔ ${1}" 1>&2
-    if [ "$_ST" -eq 0 ]; then
+	echo "⛔ $1" 1>&2
+    if [[ "${_ST}" -eq 0 ]]; then
         exit 1
     fi
 	exit "${_ST}"
@@ -25,25 +25,13 @@ function fail() {
 
 
 # OS
-# TODO: Confirm setting EXE to .exe is not required
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 echo "OS: ${OS}"
 case "${OS}" in
-darwin)
-    OS="Darwin"
-    FTYPE="tar.gz"
-    ;;
-linux)
-    OS="Linux"
-    FTYPE="tar.gz"
-    ;;
-mingw* | msys* | cygwin* | windows*)
-    OS="Windows"
-    FTYPE="zip"
-    ;;
-*)
-    fail "unknown os: $(uname -s)"
-    ;;
+darwin) OS="Darwin" ;;
+linux) OS="Linux" ;;
+mingw*|msys*|cygwin*|windows*) OS="Windows" ;;
+*) fail "unknown os: $(uname -s)" ;;
 esac
 echo "OS: ${OS}"
 
@@ -51,28 +39,24 @@ echo "OS: ${OS}"
 # ARCH
 ARCH="$(uname -m)"
 echo "ARCH: ${ARCH}"
-if [[ ${OS} = "Darwin" ]] && sysctl hw.optional.arm64 2>/dev/null | grep -q ': 1'; then
-    ARCH="arm64"
-elif uname -m | grep -E '(aarch64|arm64)' > /dev/null; then
-    ARCH="arm64"
-elif uname -m | grep 64 > /dev/null; then
-    ARCH="x86_64"
-elif uname -m | grep 386 > /dev/null; then
-    ARCH="i386"
-else
-    fail "unknown arch: $(uname -m)"
-fi
+case "${ARCH}" in
+aarch64|arm64) ARCH="arm64" ;;
+amd64|x86_64) ARCH="x86_64" ;;
+i386|i486|i586|i686) ARCH="i386" ;;
+*) fail "unknown arch: ${ARCH}" ;;
+esac
 echo "ARCH: ${ARCH}"
 
 
 # FTYPE
-if [[ ${FTYPE} = "tar.gz" ]]; then
-    which tar > /dev/null || fail "tar is not installed"
-    which gzip > /dev/null || fail "gzip is not installed"
-elif [[ ${FTYPE} = "zip" ]]; then
+if [[ "${OS}" = "Windows" ]]; then
+    # TODO: Confirm setting ${EXE} to .exe is not required
+    FTYPE="zip"
     which unzip > /dev/null || fail "unzip is not installed"
 else
-    fail "unknown file type: ${FTYPE}"
+    FTYPE="tar.gz"
+    which tar > /dev/null || fail "tar is not installed"
+    which gzip > /dev/null || fail "gzip is not installed"
 fi
 echo "FTYPE: ${FTYPE}"
 
@@ -98,14 +82,14 @@ echo "GET: ${GET}"
 
 
 # BIN
-echo "Target Directory: $TARGET_BIN"
+echo "Target Directory: ${TARGET_BIN}"
 echo -n "Enter Path [press <enter> to accept]: "
 read -r input </dev/tty
 if [[ -n "${input}" ]]; then
     # TODO: Sanatize TARGET_BIN
     TARGET_BIN="${input}"
 fi
-echo "TARGET_BIN: $TARGET_BIN"
+echo "TARGET_BIN: ${TARGET_BIN}"
 
 
 # PATH
@@ -120,13 +104,13 @@ fi
 
 
 # TEMP
-TEMP_DIR=$(mktemp -d -t install-release-XXXXXXXXXX 2>&1)
+TEMP_DIR=$(mktemp -d -t install-release-XXXXXXXXXX)
 echo "TEMP_DIR: ${TEMP_DIR}"
 
 function _execution_trap() {
 	_ST="$?"
 	rm -rf "${TEMP_DIR}"
-	if [[ "${_ST}" != "0" ]]; then
+    if [[ "${_ST}" -ne 0 ]]; then
 	    echo "⛔ Installation Error! Exit Code: ${_ST}" 1>&2
 	fi
 	exit "${_ST}"
