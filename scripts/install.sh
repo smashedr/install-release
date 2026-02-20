@@ -154,15 +154,9 @@ echo "DEST: ${DEST}"
 
 
 # MOVE
-MOVE_OUT=$(mv "${TEMP_BIN}" "${DEST}" 2>&1)
-MOVE_ST=$?
-echo "MOVE_ST: ${MOVE_ST}"
-echo "MOVE_OUT: ${MOVE_OUT}"
-if [[ "${MOVE_ST}" != "0" ]]; then
-    if [[ ${MOVE_OUT} =~ "Permission denied" ]]; then
-        echo "mv with sudo..."
-        sudo mv "${TEMP_BIN}" "${DEST}" || fail "sudo mv failed"
-    fi
+if ! mv "${TEMP_BIN}" "${DEST}"; then
+    echo "retrying mv with sudo..."
+    sudo mv "${TEMP_BIN}" "${DEST}" || fail "sudo mv failed"
 fi
 
 
