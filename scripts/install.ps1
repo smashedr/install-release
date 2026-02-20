@@ -9,12 +9,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$exeName = "ir"
+
 $repository = "smashedr/install-release"
+$exeName = "ir"
 
-Write-Host -ForegroundColor Green "Installing: $repository"
 
-## ARCH
+Write-Host -ForegroundColor Green "Installing: $repository as $exeName"
+
+
+## OS
 if (-not (Test-Path variable:IsWindows)) {
     Write-Host -ForegroundColor DarkCyan "Windows Detected. Forcing IsWindows."
     $script:IsWindows = $true
@@ -29,6 +32,9 @@ $platform = switch ($true) {
     }
 }
 Write-Host -ForegroundColor DarkCyan "platform: $platform"
+
+
+## ARCH
 $osArchitecture = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture
 Write-Host -ForegroundColor DarkCyan "osArchitecture: $osArchitecture"
 $arch = switch ($osArchitecture) {
@@ -42,6 +48,7 @@ $arch = switch ($osArchitecture) {
 }
 Write-Host -ForegroundColor DarkCyan "arch: $arch"
 
+
 ## FILE
 if ($IsWindows) {
     $binPath = Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps"
@@ -54,8 +61,12 @@ if ($IsWindows) {
 Write-Host -ForegroundColor DarkCyan "exeName: $exeName"
 Write-Host -ForegroundColor DarkCyan "binPath: $binPath"
 Write-Host -ForegroundColor DarkCyan "file: $file"
+
+
+## URL
 $url = "https://github.com/$repository/releases/latest/download/$file"
 Write-Host -ForegroundColor DarkCyan "url: $url"
+
 
 ## BIN
 Write-Host -ForegroundColor White "Target Directory: $binPath"
@@ -74,6 +85,7 @@ if (-not (Test-Path $binPath)) {
     Write-Host -ForegroundColor Red "Directory does not exist: $binPath"
     throw
 }
+
 
 ## PATH
 if ($IsWindows) {
@@ -103,6 +115,7 @@ if ($IsWindows) {
     }
 }
 
+
 ## TEMP
 $temp = [system.io.path]::GetTempPath()
 Write-Host -ForegroundColor DarkCyan "temp: $temp"
@@ -111,19 +124,21 @@ Write-Host -ForegroundColor DarkCyan "tempDir: $tempDir"
 $zipPath = Join-Path $tempDir $file
 Write-Host -ForegroundColor DarkCyan "zipPath: $zipPath"
 
-## EXEC
+
 try {
     # Download
     Write-Host -ForegroundColor DarkCyan "Downloading: $url"
     New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
     Invoke-WebRequest -Uri $url -OutFile $zipPath
+
     # Extract
     if ($zipPath -like "*.tar.gz") {
         tar -xzf $zipPath -C $tempDir
     } else {
         Expand-Archive -Path $zipPath -DestinationPath $tempDir -Force
     }
-    # Install
+
+    # Move
     $source = Join-Path $tempDir $exeName
     Move-Item -Path $source -Destination $binPath -Force
 } catch {
