@@ -31,6 +31,7 @@
 <img alt="Install Release" align="right" width="128" height="auto" src="https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/docs/assets/images/logo.svg"></a>
 
 - [Install](#install)
+- [Features](#features)
 - [Usage](#usage)
 - [Development](#development)
 - [Support](#Support)
@@ -38,13 +39,26 @@
 
 CLI to Install a GitHub Release.
 
-Easily Install GitHub Release binaries with Windows, Linux and macOS Support.
+Easily Install GitHub Release binaries on Windows, Linux and macOS.
+
+Interactively select the release version, asset, and executable name with automatically detected presets.
 
 [![VHS Tape](https://cssnr.s3.amazonaws.com/install-release/demo.gif)](https://smashedr.github.io/install-release/)
 
 > [!IMPORTANT]  
 > This project is in development.
 > It is functional but may have bugs.
+
+## Features
+
+- Supports Windows, Linux and macOS
+- Interactively Select Options
+- Set Options w/ Flags or Variables
+- Save or Set a Custom `bin` Path
+- List and Remove Installed Apps
+- Get App Information
+
+[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=quicklook)](https://smashedr.github.io/install-release/)
 
 ## Install
 
