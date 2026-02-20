@@ -11,7 +11,6 @@ TARGET_BIN="${HOME}/bin"
 
 
 echo "Installing: ${OWNER}/${REPO} as ${EXE}"
-echo "TARGET_BIN: ${TARGET_BIN}"
 
 
 function fail() {
@@ -97,8 +96,18 @@ fi
 echo "GET: ${GET}"
 
 
+# BIN
+echo "Target Directory: $TARGET_BIN"
+echo -n "Enter Path [press <enter> to accept]: "
+read -r input
+if [[ -n "${input}" ]]; then
+    # TODO: Sanatize TARGET_BIN
+    TARGET_BIN="${input}"
+fi
+echo "TARGET_BIN: $TARGET_BIN"
+
+
 # PATH
-# TODO: Add prompt for TARGET_BIN
 if ! echo "${PATH}" | tr ':' '\n' | grep -qx "${TARGET_BIN}"; then
     echo "⚠️ Target bin NOT in PATH: ${TARGET_BIN}"
     # TODO: Add TARGET_BIN to PATH
@@ -144,7 +153,7 @@ echo "DEST: ${DEST}"
 
 
 # MOVE
-mv "${TEMP_BIN}" "${DEST}"
+mv "${TEMP_BIN}" "${DEST}" || fail "move to destination failed"
 
 #OUT=$(mv "${TEMP_BIN}" "${DEST}" 2>&1)
 #STATUS=$?
