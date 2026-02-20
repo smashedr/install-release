@@ -28,6 +28,7 @@ tasks:
       - task: pslint
 
   pslint:
+    desc: Invoke-ScriptAnalyzer does NOT exit with error!
     platforms: [windows]
     cmd: powershell -Command "Invoke-ScriptAnalyzer -Path scripts -Recurse"
 

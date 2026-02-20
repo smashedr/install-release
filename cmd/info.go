@@ -31,9 +31,12 @@ var infoCmd = &cobra.Command{
 			}
 			log.Info("Repository", "owner", owner, "repo", repo, "tag", tag)
 			client := getClient()
-			release, err := getRelease(client, owner, repo, tag, preRelease)
+			release, err := getRelease(client, owner, repo, tag, preRelease, true)
 			if err != nil {
 				log.Fatalf("Error getting release: %v", err)
+			}
+			if release == nil {
+				log.Fatalf("No release found")
 			}
 			if verbose >= 3 {
 				log.Debugf("%v", release)

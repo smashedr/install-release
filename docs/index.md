@@ -11,11 +11,11 @@ icon: lucide/rocket
 [![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/install-release)](https://github.com/smashedr/install-release/pkgs/container/install-release)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/smashedr/install-release?logo=go&logoColor=white&label=go)](https://github.com/smashedr/install-release/blob/master/go.mod)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/install-release?logo=listenhub&label=updated)](https://github.com/smashedr/install-release/pulse)
-[![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/install-release?logo=buffer&label=repo%20size)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
+[![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/install-release?logo=googlecloudstorage&logoColor=white&label=repo%20size)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
 [![GitHub Top Language](https://img.shields.io/github/languages/top/smashedr/install-release?logo=devbox)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
 [![GitHub Contributors](https://img.shields.io/github/contributors-anon/smashedr/install-release?logo=southwestairlines)](https://github.com/smashedr/install-release/graphs/contributors)
 [![GitHub Issues](https://img.shields.io/github/issues/smashedr/install-release?logo=codeforces&logoColor=white)](https://github.com/smashedr/install-release/issues)
-[![GitHub Discussions](https://img.shields.io/github/discussions/smashedr/install-release?logo=theconversation&logoColor=white)](https://github.com/smashedr/install-release/discussions)
+[![GitHub Discussions](https://img.shields.io/github/discussions/smashedr/install-release?logo=theconversation)](https://github.com/smashedr/install-release/discussions)
 [![GitHub Forks](https://img.shields.io/github/forks/smashedr/install-release?style=flat&logo=forgejo&logoColor=white)](https://github.com/smashedr/install-release/forks)
 [![GitHub Repo Stars](https://img.shields.io/github/stars/smashedr/install-release?style=flat&logo=gleam&logoColor=white)](https://github.com/smashedr/install-release/stargazers)
 [![GitHub Org Stars](https://img.shields.io/github/stars/cssnr?style=flat&logo=apachespark&logoColor=white&label=org%20stars)](https://cssnr.github.io/)
@@ -24,7 +24,9 @@ icon: lucide/rocket
 
 CLI to Install a GitHub Release.
 
-Easily Install GitHub Release binaries with Windows, Linux and macOS Support.
+Easily Install GitHub Release binaries on Windows, Linux and macOS.
+
+Interactively select the release version, asset, and executable name with automatically detected presets.
 
 --8<-- "docs/snippets/install.md"
 
@@ -38,12 +40,12 @@ If you run into any issues or have any questions, [support](support.md) is avail
 
 ## :lucide-sparkles: Features
 
-- Supports Windows
-- Custom `bin` Path
-- Automatic Release Detection
-- Select Asset and Name Interactively
-- Set Asset and Name Programmatically
+- Supports Windows, Linux and macOS
+- Interactively Select Options
+- Set Options w/ Flags or Variables
+- Save or Set a Custom `bin` Path
 - List and Remove Installed Apps
+- Get App Information
 
 ## :lucide-plane-takeoff: Install
 

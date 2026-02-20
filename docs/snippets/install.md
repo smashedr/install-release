@@ -7,7 +7,7 @@
 === ":lucide-terminal-square: bash"
 
     ```shell
-    curl 'https://i.jpillora.com/smashedr/install-release!?as=ir' | bash  # (1)!
+    curl 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.sh' | bash  # (1)!
     ```
 
     1.  Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).

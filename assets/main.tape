@@ -3,6 +3,19 @@ Type "ir smashedr/bup"
 Sleep 0.5s
 Enter
 
+# select version
+Wait / [0-9]\.[0-9]/
+Sleep 1.5s
+Down
+Sleep 0.2s
+Down
+Sleep 0.5s
+Up
+Sleep 0.2s
+Up
+Sleep 0.5s
+Enter
+# select asset
 Wait / bup_/
 Sleep 1.5s
 Up
@@ -14,6 +27,7 @@ Sleep 0.2s
 Down
 Sleep 0.5s
 Enter
+# set name
 Wait /\> /
 Sleep 1s
 Backspace
