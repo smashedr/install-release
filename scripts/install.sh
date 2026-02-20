@@ -25,6 +25,7 @@ function fail() {
 
 
 # OS
+# TODO: Confirm setting EXE to .exe is not required
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 echo "OS: ${OS}"
 case "${OS}" in
@@ -99,7 +100,7 @@ echo "GET: ${GET}"
 # BIN
 echo "Target Directory: $TARGET_BIN"
 echo -n "Enter Path [press <enter> to accept]: "
-read -r input
+read -r input </dev/tty
 if [[ -n "${input}" ]]; then
     # TODO: Sanatize TARGET_BIN
     TARGET_BIN="${input}"
@@ -153,18 +154,16 @@ echo "DEST: ${DEST}"
 
 
 # MOVE
-mv "${TEMP_BIN}" "${DEST}" || fail "move to destination failed"
-
-#OUT=$(mv "${TEMP_BIN}" "${DEST}" 2>&1)
-#STATUS=$?
-#echo "OUT: ${OUT}"
-#echo "STATUS: ${STATUS}"
-#if [[ "${STATUS}" != "0" ]]; then
-#    if [[ $OUT =~ "Permission denied" ]]; then
-#        echo "mv with sudo..."
-#        sudo mv "${TEMP_BIN}" "${DEST}" || fail "sudo mv failed"
-#    fi
-#fi
+MOVE_OUT=$(mv "${TEMP_BIN}" "${DEST}" 2>&1)
+MOVE_ST=$?
+echo "MOVE_ST: ${MOVE_ST}"
+echo "MOVE_OUT: ${MOVE_OUT}"
+if [[ "${MOVE_ST}" != "0" ]]; then
+    if [[ ${MOVE_OUT} =~ "Permission denied" ]]; then
+        echo "mv with sudo..."
+        sudo mv "${TEMP_BIN}" "${DEST}" || fail "sudo mv failed"
+    fi
+fi
 
 
 echo "✅ Successfully Installed: ${EXE}"
