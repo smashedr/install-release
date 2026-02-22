@@ -1,6 +1,7 @@
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/install-release?logo=github)](https://github.com/smashedr/install-release/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/smashedr/install-release/total?logo=rolldown&logoColor=white)](https://github.com/smashedr/install-release/releases/latest)
-[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/install-release)](https://github.com/smashedr/install-release/pkgs/container/install-release)
+[![Asset Size](https://badges.cssnr.com/gh/release/smashedr/install-release/latest/asset/ir_Windows_x86_64.zip/size?label=asset&lucide=file-archive)](https://github.com/smashedr/install-release/releases/latest)
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/install-release?label=docker)](https://github.com/smashedr/install-release/pkgs/container/install-release)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/smashedr/install-release?logo=go&logoColor=white&label=go)](https://github.com/smashedr/install-release/blob/master/go.mod)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smashedr_install-release&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smashedr_install-release)
 [![Deployment Docs](https://img.shields.io/github/deployments/smashedr/install-release/docs?logo=materialformkdocs&logoColor=white&label=docs)](https://github.com/smashedr/install-release/deployments/docs)

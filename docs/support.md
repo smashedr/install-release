@@ -6,10 +6,14 @@ icon: lucide/message-circle-question-mark
 
 [![Install Release](assets/images/logo.svg){ align=right width=96 }](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
 
+<p markdown="1" style="line-height: 1.2;" >
+
 [![Features](https://img.shields.io/badge/features-brightgreen?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/smashedr/install-release/issues/new?template=1-feature.yaml)
 [![Issues](https://img.shields.io/badge/issues-red?style=for-the-badge&logo=southwestairlines&logoColor=white)](https://github.com/smashedr/install-release/issues)
 [![Discussions](https://img.shields.io/badge/discussions-blue?style=for-the-badge&logo=theconversation)](https://github.com/smashedr/install-release/discussions)
 [![Discord](https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/wXy6m2X8wY)
+
+</p>
 
 If you run into any [issues](https://github.com/smashedr/install-release/issues),
 want to see more [features](https://github.com/smashedr/install-release/issues/new?template=1-feature.yaml)
@@ -50,10 +54,5 @@ More information available at: [https://cssnr.com/](https://cssnr.com/)
 
 [![Support on Ko-fi](https://cdn.prod.website-files.com/5c14e387dab576fe667689cf/670f5a01c01ea9191809398c_support_me_on_kofi_blue.png){ width="360" }](https://ko-fi.com/cssnr)
 
-<a href="https://github.com/smashedr/install-release/stargazers">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right" />
- </picture>
-</a>
+[![Star History](https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right#only-light)](https://github.com/smashedr/install-release/stargazers){ style="border-radius: 12px;" }
+[![Star History](https://api.star-history.com/svg?repos=smashedr/install-release&type=date&legend=bottom-right&theme=dark#only-dark)](https://github.com/smashedr/install-release/stargazers){ style="border-radius: 12px;" }

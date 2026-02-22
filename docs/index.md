@@ -6,9 +6,12 @@ icon: lucide/rocket
 
 [![Install Release](assets/images/logo.svg){ align=right width=96 }](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
 
+<p markdown="1" style="line-height: 1.2;" >
+
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/install-release?logo=github)](https://github.com/smashedr/install-release/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/smashedr/install-release/total?logo=rolldown&logoColor=white)](https://github.com/smashedr/install-release/releases/latest)
-[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/install-release)](https://github.com/smashedr/install-release/pkgs/container/install-release)
+[![APK Size](https://badges.cssnr.com/gh/release/smashedr/install-release/latest/asset/ir_Windows_x86_64.zip/size?label=asset&lucide=file-archive)](https://github.com/smashedr/install-release/releases/latest)
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/install-release?label=docker)](https://github.com/smashedr/install-release/pkgs/container/install-release)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/smashedr/install-release?logo=go&logoColor=white&label=go)](https://github.com/smashedr/install-release/blob/master/go.mod)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/install-release?logo=listenhub&label=updated)](https://github.com/smashedr/install-release/pulse)
 [![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/install-release?logo=googlecloudstorage&logoColor=white&label=repo%20size)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
@@ -21,6 +24,8 @@ icon: lucide/rocket
 [![GitHub Org Stars](https://img.shields.io/github/stars/cssnr?style=flat&logo=apachespark&logoColor=white&label=org%20stars)](https://cssnr.github.io/)
 [![Discord](https://img.shields.io/discord/899171661457293343?logo=discord&logoColor=white&label=discord&color=7289da)](https://discord.gg/wXy6m2X8wY)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-72a5f2?logo=kofi&label=support)](https://ko-fi.com/cssnr)
+
+</p>
 
 CLI to Install a GitHub Release.
 
@@ -52,6 +57,7 @@ If you run into any issues or have any questions, [support](support.md) is avail
 --8<-- "docs/snippets/install.md"
 
 [![Latest Release](https://img.shields.io/github/v/release/smashedr/install-release?style=for-the-badge&logo=github&label=latest%20version)](https://github.com/smashedr/install-release/releases/latest)
+[![Latest Pre-Release](https://img.shields.io/github/v/release/smashedr/install-release?style=for-the-badge&logo=github&include_prereleases&label=pre-release)](https://github.com/smashedr/install-release/releases)
 
 ## :lucide-terminal-square: Usage
 

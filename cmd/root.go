@@ -16,7 +16,7 @@ var (
 var rootCmd = &cobra.Command{
 	Use:     "ir owner/repo [tag]",
 	Short:   "CLI to Install a GitHub Release",
-	Long:    "Easily Install GitHub Release binaries with Windows, Linux and macOS Support.",
+	Long:    "Easily Install GitHub Release binaries on Windows, Linux and macOS.",
 	Example: "  ir smashedr/bup\n  ir list",
 	Args:    cobra.ArbitraryArgs,
 	RunE:    runInstall,
