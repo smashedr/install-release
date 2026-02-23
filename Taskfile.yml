@@ -16,6 +16,10 @@ tasks:
       - go get -u
       - task: tidy
 
+  actions:
+    desc: Actions Up
+    cmd: actions-up --exclude "cssnr/.*,actions/.*,docker/.*" --yes
+
   lint:
     desc: Lint
     cmds:

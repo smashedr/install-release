@@ -17,6 +17,7 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -28,6 +29,12 @@ var archAliases = map[string][]string{
 	"amd64": {"amd64", "x86_64", "win64", "x64"},
 	"386":   {"i386", "386", "win32", "x32"},
 	"arm64": {"arm64", "aarch64"},
+}
+
+type Repository struct {
+	Owner string
+	Name  string
+	Tag   string
 }
 
 func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
@@ -45,28 +52,29 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		return fmt.Errorf("repository must be in format: owner/repo")
 	}
 
-	owner, repo, tag, err := parseRepository(args)
+	repo, err := parseRepository(args)
 	if err != nil {
+		log.Debugf("parseRepository err: %v", err)
 		_ = cmd.Help()
 		return err
 	}
-	log.Info("Repository", "owner", owner, "repo", repo, "tag", tag)
+	log.Info("Repository", "repo", repo)
 
 	log.Info("runtime", "GOOS", runtime.GOOS, "GOARCH", runtime.GOARCH)
 
-	tagDisplay := tag
-	if tag == "" {
+	tagDisplay := repo.Tag
+	if repo.Tag == "" {
 		if preRelease {
 			tagDisplay = "pre-release"
 		} else {
 			tagDisplay = "latest"
 		}
 	}
-	styles.PrintKV("Repository", fmt.Sprintf("%s/%s:%s", owner, repo, tagDisplay))
+	styles.PrintKV("Repository", fmt.Sprintf("%s/%s:%s", repo.Owner, repo.Name, tagDisplay))
 
 	client := getClient()
 
-	release, err := getRelease(client, owner, repo, tag, preRelease, skipPrompts)
+	release, err := getRelease(client, repo, preRelease, skipPrompts)
 	if err != nil {
 		return fmt.Errorf("get release error: %w", err)
 	}
@@ -120,7 +128,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	styles.PrintKV("Asset Name", asset.GetName())
 
 	rc, _, err := client.Repositories.DownloadReleaseAsset(
-		context.Background(), owner, repo, asset.GetID(), http.DefaultClient,
+		context.Background(), repo.Owner, repo.Name, asset.GetID(), http.DefaultClient,
 	)
 	if err != nil {
 		return err
@@ -395,22 +403,22 @@ func getClient() *github.Client {
 	return github.NewClient(httpClient)
 }
 
-func getRelease(client *github.Client, owner, repo, tag string, pre, skip bool) (*github.RepositoryRelease, error) {
+func getRelease(client *github.Client, repo Repository, pre, skip bool) (*github.RepositoryRelease, error) {
 	ctx := context.Background()
 	var release *github.RepositoryRelease
 	var err error
-	if tag != "" {
-		log.Debugf("client.Repositories.GetReleaseByTag: %v", tag)
-		release, _, err = client.Repositories.GetReleaseByTag(ctx, owner, repo, tag)
+	if repo.Tag != "" {
+		log.Debugf("client.Repositories.GetReleaseByTag: %v", repo.Tag)
+		release, _, err = client.Repositories.GetReleaseByTag(ctx, repo.Owner, repo.Name, repo.Tag)
 	} else if pre {
 		log.Debugf("GetLatestRelease")
-		release, err = getLatestRelease(client, owner, repo)
+		release, err = getLatestRelease(client, repo)
 	} else if skip {
 		log.Debugf("client.Repositories.GetLatestRelease")
-		release, _, err = client.Repositories.GetLatestRelease(ctx, owner, repo)
+		release, _, err = client.Repositories.GetLatestRelease(ctx, repo.Owner, repo.Name)
 	} else {
 		log.Debugf("chooseRelease")
-		release, err = chooseRelease(client, owner, repo, 30)
+		release, err = chooseRelease(client, repo, 30)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("get release error: %w", err)
@@ -418,8 +426,8 @@ func getRelease(client *github.Client, owner, repo, tag string, pre, skip bool) 
 	return release, nil
 }
 
-func getLatestRelease(client *github.Client, owner, repo string) (*github.RepositoryRelease, error) {
-	releases, err := getReleases(client, owner, repo, 1)
+func getLatestRelease(client *github.Client, repo Repository) (*github.RepositoryRelease, error) {
+	releases, err := getReleases(client, repo, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -429,17 +437,17 @@ func getLatestRelease(client *github.Client, owner, repo string) (*github.Reposi
 	return releases[0], nil
 }
 
-func getReleases(client *github.Client, owner, repo string, number int) ([]*github.RepositoryRelease, error) {
+func getReleases(client *github.Client, repo Repository, number int) ([]*github.RepositoryRelease, error) {
 	ctx := context.Background()
-	releases, _, err := client.Repositories.ListReleases(ctx, owner, repo, &github.ListOptions{PerPage: number})
+	releases, _, err := client.Repositories.ListReleases(ctx, repo.Owner, repo.Name, &github.ListOptions{PerPage: number})
 	if err != nil {
 		return nil, err
 	}
 	return releases, nil
 }
 
-func chooseRelease(client *github.Client, owner, repo string, number int) (*github.RepositoryRelease, error) {
-	releases, err := getReleases(client, owner, repo, number)
+func chooseRelease(client *github.Client, repo Repository, number int) (*github.RepositoryRelease, error) {
+	releases, err := getReleases(client, repo, number)
 	if err != nil {
 		return nil, fmt.Errorf("error getting releases: %w", err)
 	}
@@ -477,52 +485,84 @@ func ensureWinExt(destName string) string {
 	return destName
 }
 
-func parseRepository(args []string) (owner, repo, tag string, err error) {
+func parseRepository(args []string) (repo Repository, err error) {
 	helpErr := errors.New("repository format: owner/repo[:tag]")
 	log.Debugf("parseRepository %v: %v", len(args), args)
+
 	switch len(args) {
 	case 0:
-		return "", "", "", helpErr
+		return repo, helpErr
 	case 1:
-		repository := args[0]
+		// Parse URL
+		parsed := parseURL(args[0])
+		log.Debug("URL", "args[0]", args[0], "parsed", parsed)
+		fullName := parsed
 		// Check for :tag @tag /tag
-		if idx := strings.IndexAny(args[0], ":@"); idx != -1 {
+		if idx := strings.IndexAny(parsed, ":@"); idx != -1 {
 			log.Debugf("idx: %v", idx)
-			repository = args[0][:idx]
-			tag = args[0][idx+1:]
-		} else if strings.Count(args[0], "/") == 2 {
-			split := strings.Split(args[0], "/")
+			fullName = parsed[:idx]
+			repo.Tag = parsed[idx+1:]
+		} else if strings.Count(parsed, "/") == 2 {
+			split := strings.Split(parsed, "/")
 			if split[2] != "" {
-				repository = split[0] + "/" + split[1]
-				tag = split[2]
+				fullName = split[0] + "/" + split[1]
+				repo.Tag = split[2]
 			}
 		}
 		// Set owner/repo
-		split := strings.Split(repository, "/")
+		split := strings.Split(fullName, "/")
 		if len(split) != 2 {
-			return "", "", "", helpErr
+			return repo, helpErr
 		}
-		owner = split[0]
-		repo = split[1]
+		repo.Owner = split[0]
+		repo.Name = split[1]
 	case 2:
 		if strings.Contains(args[0], "/") {
 			split := strings.Split(args[0], "/")
-			owner = split[0]
-			repo = split[1]
-			tag = args[1]
+			repo.Owner = split[0]
+			repo.Name = split[1]
+			repo.Tag = args[1]
 		} else {
-			owner = args[0]
-			repo = args[1]
+			repo.Owner = args[0]
+			repo.Name = args[1]
 		}
 	default:
-		owner = args[0]
-		repo = args[1]
-		tag = args[2]
+		repo.Owner = args[0]
+		repo.Name = args[1]
+		repo.Tag = args[2]
 	}
 
-	if owner == "" || repo == "" {
+	if repo.Owner == "" || repo.Name == "" {
 		log.Infof("owner/repo are blank")
-		return "", "", "", helpErr
+		return repo, helpErr
 	}
 	return
+}
+
+func parseURL(original string) string {
+	log.Debugf("parseURL: %v", original)
+	u, err := url.Parse(original)
+	if err != nil {
+		log.Debug(err)
+		return original
+	}
+	u.Path = strings.TrimLeft(u.Path, "/")
+	log.Debug("Original", "Host", u.Host, "Path", u.Path)
+
+	if u.Host == "" && strings.HasPrefix(strings.ToLower(u.Path), "github.com/") {
+		u.Scheme = "https"
+		u.Host = "github.com"
+		u.Path = u.Path[11:]
+	}
+
+	log.Debug("Updated", "Host", u.Host, "Path", u.Path)
+
+	split := strings.Split(strings.TrimRight(u.Path, "/"), "/")
+	log.Debugf("split: %v", split)
+	count := len(split)
+	log.Debugf("count: %v", count)
+	if count < 2 {
+		return original
+	}
+	return u.Path
 }
