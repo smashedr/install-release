@@ -10,8 +10,8 @@ icon: lucide/rocket
 
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/install-release?logo=github)](https://github.com/smashedr/install-release/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/smashedr/install-release/total?logo=rolldown&logoColor=white)](https://github.com/smashedr/install-release/releases/latest)
-[![APK Size](https://badges.cssnr.com/gh/release/smashedr/install-release/latest/asset/ir_Windows_x86_64.zip/size?label=asset&lucide=file-archive)](https://github.com/smashedr/install-release/releases/latest)
-[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/install-release?label=docker)](https://github.com/smashedr/install-release/pkgs/container/install-release)
+[![Asset Size](https://badges.cssnr.com/gh/release/smashedr/install-release/latest/asset/ir_Windows_x86_64.zip/size?label=asset&lucide=file-archive&color=darkgreen)](https://github.com/smashedr/install-release/releases/latest)
+[![Image Size](https://badges.cssnr.com/ghcr/size/smashedr/install-release?label=docker&color=darkgreen)](https://github.com/smashedr/install-release/pkgs/container/install-release)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/smashedr/install-release?logo=go&logoColor=white&label=go)](https://github.com/smashedr/install-release/blob/master/go.mod)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/install-release?logo=listenhub&label=updated)](https://github.com/smashedr/install-release/pulse)
 [![GitHub Repo Size](https://img.shields.io/github/repo-size/smashedr/install-release?logo=googlecloudstorage&logoColor=white&label=repo%20size)](https://github.com/smashedr/install-release?tab=readme-ov-file#readme)
@@ -56,8 +56,8 @@ If you run into any issues or have any questions, [support](support.md) is avail
 
 --8<-- "docs/snippets/install.md"
 
-[![Latest Release](https://img.shields.io/github/v/release/smashedr/install-release?style=for-the-badge&logo=github&label=latest%20version)](https://github.com/smashedr/install-release/releases/latest)
-[![Latest Pre-Release](https://img.shields.io/github/v/release/smashedr/install-release?style=for-the-badge&logo=github&include_prereleases&label=pre-release)](https://github.com/smashedr/install-release/releases)
+[![Latest Release](https://img.shields.io/github/v/release/smashedr/install-release?style=for-the-badge&logo=github&label=latest%20version&color=blue)](https://github.com/smashedr/install-release/releases/latest)
+[![Latest Pre-Release](https://img.shields.io/github/v/release/smashedr/install-release?style=for-the-badge&logo=github&include_prereleases&label=pre-release&color=orange)](https://github.com/smashedr/install-release/releases)
 
 ## :lucide-terminal-square: Usage
 
@@ -79,17 +79,32 @@ Install a specific version/tag.
 ir owner/repo v1.0.0
 ```
 
-Install using many formats:
+Specify repo in any format:
 
 ```shell
-ir owner repo
-ir owner/repo
-ir owner repo tag
-ir owner/repo tag
-ir owner/repo/tag
-ir owner/repo:tag
-ir owner/repo@tag
+ir owner[/ ]repo
+ir owner[/ ]repo[@:/ ]tag
+ir github.com/owner[/ ]repo[@:/ ]tag
+ir https://github.com/owner[/ ]repo[@:/ ]tag
 ```
+
+<details><summary>View Examples</summary>
+
+```shell
+ir smashedr bup
+ir smashedr/bup
+ir smashedr bup latest
+ir smashedr/bup latest
+ir smashedr/bup/latest
+ir smashedr/bup:latest
+ir smashedr/bup@latest
+ir github.com/smashedr/bup
+ir github.com/smashedr/bup/latest
+ir https://github.com/smashedr/bup
+ir https://github.com/smashedr/bup@latest
+```
+
+</details>
 
 Skip the asset and name prompts.
 

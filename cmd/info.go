@@ -24,14 +24,14 @@ var infoCmd = &cobra.Command{
 		log.Debug("infoCmd", "args", args, "binPath", binPath, "preRelease", preRelease)
 
 		if len(args) >= 1 && strings.Contains(args[0], "/") {
-			owner, repo, tag, err := parseRepository(args)
+			repo, err := parseRepository(args)
 			if err != nil {
 				_ = cmd.Help()
 				log.Fatal(err)
 			}
-			log.Info("Repository", "owner", owner, "repo", repo, "tag", tag)
+			log.Info("Repository", "repo", repo)
 			client := getClient()
-			release, err := getRelease(client, owner, repo, tag, preRelease, true)
+			release, err := getRelease(client, repo, preRelease, true)
 			if err != nil {
 				log.Fatalf("Error getting release: %v", err)
 			}
