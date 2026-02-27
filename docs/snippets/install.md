@@ -7,7 +7,7 @@
 === ":lucide-terminal-square: bash"
 
     ```shell
-    curl 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.sh' | bash  # (1)!
+    curl 'https://raw.githubusercontent.com/smashedr/install-release/master/scripts/install.sh' | bash  # (1)!
     ```
 
     1.  Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
@@ -15,7 +15,7 @@
 === ":lucide-terminal: powershell"
 
     ```powershell
-    iex (iwr -useb 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.ps1').Content  # (1)!
+    iex (iwr -useb 'https://raw.githubusercontent.com/smashedr/install-release/master/scripts/install.ps1').Content  # (1)!
     ```
 
     1.  Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).

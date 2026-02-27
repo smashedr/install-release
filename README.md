@@ -30,7 +30,7 @@
 [![Windows Installer](https://img.shields.io/badge/windows_installer-gray?style=flat-square&logo=data:image/svg%2bxml;base64,PHN2ZyB3aWR0aD0iMjQ5MCIgaGVpZ2h0PSIyNTAwIiB2aWV3Qm94PSIwIDAgMjU2IDI1NyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCI+PHBhdGggZD0iTTAgMzYuMzU3TDEwNC42MiAyMi4xMWwuMDQ1IDEwMC45MTQtMTA0LjU3LjU5NUwwIDM2LjM1OHptMTA0LjU3IDk4LjI5M2wuMDggMTAxLjAwMkwuMDgxIDIyMS4yNzVsLS4wMDYtODcuMzAyIDEwNC40OTQuNjc3em0xMi42ODItMTE0LjQwNUwyNTUuOTY4IDB2MTIxLjc0bC0xMzguNzE2IDEuMVYyMC4yNDZ6TTI1NiAxMzUuNmwtLjAzMyAxMjEuMTkxLTEzOC43MTYtMTkuNTc4LS4xOTQtMTAxLjg0TDI1NiAxMzUuNnoiIGZpbGw9IiMwMEFERUYiLz48L3N2Zz4=)](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe)
 
 <a title="Install Release" href="https://smashedr.github.io/install-release" target="_blank">
-<img alt="Install Release" align="right" width="128" height="auto" src="https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/docs/assets/images/logo.svg"></a>
+<img alt="Install Release" align="right" width="128" height="auto" src="https://raw.githubusercontent.com/smashedr/install-release/master/docs/assets/images/logo.svg"></a>
 
 - [Install](#install)
 - [Features](#features)
@@ -76,7 +76,7 @@ brew install cssnr/tap/install-release
 #### Bash
 
 ```shell
-curl 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.sh' | bash
+curl 'https://raw.githubusercontent.com/smashedr/install-release/master/scripts/install.sh' | bash
 ```
 
 💾 Alternatively, you can manually [download a release](https://github.com/smashedr/install-release/releases).
@@ -84,7 +84,7 @@ curl 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/mast
 #### PowerShell
 
 ```powershell
-iex (iwr -useb 'https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.ps1').Content
+iex (iwr -useb 'https://raw.githubusercontent.com/smashedr/install-release/master/scripts/install.ps1').Content
 ```
 
 🪟 Windows users can download the [Windows Installer](https://github.com/smashedr/install-release/releases/latest/download/ir_Windows_Installer.exe).

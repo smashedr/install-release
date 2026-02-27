@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.sh
+# https://raw.githubusercontent.com/smashedr/install-release/master/scripts/install.sh
 
 set -e
 

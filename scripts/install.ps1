@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# https://raw.githubusercontent.com/smashedr/install-release/refs/heads/master/scripts/install.ps1
+# https://raw.githubusercontent.com/smashedr/install-release/master/scripts/install.ps1
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
 
