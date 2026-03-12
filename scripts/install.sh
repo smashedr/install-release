@@ -105,7 +105,7 @@ fi
 
 
 ## TEMP
-TEMP_DIR=$(mktemp -d -t install-release-XXXXXXXXXX)
+TEMP_DIR=$(mktemp -d -t install-XXXXXXXXXX)
 echo "TEMP_DIR: ${TEMP_DIR}"
 
 function _execution_trap() {

@@ -42,6 +42,9 @@ func init() {
 	_ = viper.BindPFlag("name", rootCmd.PersistentFlags().Lookup("name"))
 	rootCmd.PersistentFlags().BoolP("pre", "p", false, "include pre-releases")
 
+	rootCmd.PersistentFlags().StringP("url", "u", "", "url of asset to download")
+	_ = viper.BindPFlag("url", rootCmd.PersistentFlags().Lookup("url"))
+
 	rootCmd.PersistentFlags().BoolP("yes", "y", false, "answer yes to prompts")
 	_ = viper.BindPFlag("yes", rootCmd.PersistentFlags().Lookup("yes"))
 
