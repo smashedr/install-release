@@ -35,8 +35,8 @@
 - [Install](#install)
 - [Features](#features)
 - [Usage](#usage)
+- [Support](#support)
 - [Development](#development)
-- [Support](#Support)
 - [Contributing](#contributing)
 
 CLI to Install a GitHub Release.
@@ -202,6 +202,20 @@ ir config
 
 [![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=quicklook)](https://smashedr.github.io/install-release/)
 
+## Support
+
+If you run into any issues or need help getting started, please do one of the following:
+
+- Report an Issue: <https://github.com/smashedr/install-release/issues>
+- Q&A Discussion: <https://github.com/smashedr/install-release/discussions/categories/q-a>
+- Request a Feature: <https://github.com/smashedr/install-release/issues/new?template=1-feature.yaml>
+- Chat with us on Discord: <https://discord.gg/wXy6m2X8wY>
+
+[![Features](https://img.shields.io/badge/features-brightgreen?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/smashedr/install-release/issues/new?template=1-feature.yaml)
+[![Issues](https://img.shields.io/badge/issues-red?style=for-the-badge&logo=southwestairlines&logoColor=white)](https://github.com/smashedr/install-release/issues)
+[![Discussions](https://img.shields.io/badge/discussions-blue?style=for-the-badge&logo=livechat&logoColor=white)](https://github.com/smashedr/install-release/discussions)
+[![Discord](https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/wXy6m2X8wY)
+
 # Development
 
 Go: <https://go.dev/doc/install>
@@ -228,20 +242,6 @@ Inno Setup: <https://jrsoftware.org/isdl.php>
 ```shell
 task inno
 ```
-
-# Support
-
-If you run into any issues or need help getting started, please do one of the following:
-
-- Report an Issue: <https://github.com/smashedr/install-release/issues>
-- Q&A Discussion: <https://github.com/smashedr/install-release/discussions/categories/q-a>
-- Request a Feature: <https://github.com/smashedr/install-release/issues/new?template=1-feature.yaml>
-- Chat with us on Discord: <https://discord.gg/wXy6m2X8wY>
-
-[![Features](https://img.shields.io/badge/features-brightgreen?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/smashedr/install-release/issues/new?template=1-feature.yaml)
-[![Issues](https://img.shields.io/badge/issues-red?style=for-the-badge&logo=southwestairlines&logoColor=white)](https://github.com/smashedr/install-release/issues)
-[![Discussions](https://img.shields.io/badge/discussions-blue?style=for-the-badge&logo=livechat&logoColor=white)](https://github.com/smashedr/install-release/discussions)
-[![Discord](https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/wXy6m2X8wY)
 
 # Contributing
 

@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -44,92 +45,19 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 	skipPrompts := viper.GetBool("yes")
 	assetName := viper.GetString("asset")
 	destName := viper.GetString("name")
+	assetUrl := viper.GetString("url")
 	preRelease, _ := cmd.Flags().GetBool("pre")
-	log.Info("Flags:", "skipPrompts", skipPrompts, "assetName", assetName, "destName", destName, "preRelease", preRelease)
+	log.Info("Flags:", "skipPrompts", skipPrompts, "assetName", assetName, "destName", destName, "preRelease", preRelease, "assetUrl", assetUrl)
 
-	if len(args) < 1 {
-		_ = cmd.Help()
-		return fmt.Errorf("repository must be in format: owner/repo")
-	}
+	var rc io.ReadCloser
+	var rcName string
+	var err error
 
-	repo, err := parseRepository(args)
-	if err != nil {
-		log.Debugf("parseRepository err: %v", err)
-		_ = cmd.Help()
-		return err
-	}
-	log.Info("Repository", "repo", repo)
-
-	log.Info("runtime", "GOOS", runtime.GOOS, "GOARCH", runtime.GOARCH)
-
-	tagDisplay := repo.Tag
-	if repo.Tag == "" {
-		if preRelease {
-			tagDisplay = "pre-release"
-		} else {
-			tagDisplay = "latest"
-		}
-	}
-	styles.PrintKV("Repository", fmt.Sprintf("%s/%s:%s", repo.Owner, repo.Name, tagDisplay))
-
-	client := getClient()
-
-	release, err := getRelease(client, repo, preRelease, skipPrompts)
-	if err != nil {
-		return fmt.Errorf("get release error: %w", err)
-	}
-	if release == nil {
-		return fmt.Errorf("no release found")
-	}
-	if verbose >= 3 {
-		log.Debugf("release: %v", release)
-	}
-
-	//styles.PrintKV("Version", fmt.Sprintf("%s (%s)", release.GetTagName(), release.GetName()))
-	renderReleaseTable(release)
-
-	// Asset
-	var asset *github.ReleaseAsset
-	var result int
-
-	if assetName != "" {
-		result = findAssetByName(release.Assets, assetName)
+	if assetUrl != "" {
+		rc, rcName, err = downloadAssetURL(assetUrl)
 	} else {
-		result = findAssetByPlatform(release.Assets, runtime.GOOS, runtime.GOARCH)
+		rc, rcName, err = processRepository(cmd, args, preRelease, skipPrompts, assetName)
 	}
-	log.Debugf("result: %v", result)
-
-	if result < 0 || !skipPrompts {
-		options := make([]huh.Option[int], len(release.Assets))
-		for i, asset := range release.Assets {
-			options[i] = huh.NewOption(asset.GetName(), i)
-		}
-		form := huh.NewSelect[int]().
-			Title("Select a release asset:").
-			Options(options...).
-			Value(&result)
-
-		err = form.Run()
-		if err != nil {
-			return fmt.Errorf("prompt failed: %w", err)
-		}
-	}
-
-	log.Debugf("result: %v", result)
-	asset = release.Assets[result]
-	log.Debugf("asset: %v", asset)
-
-	if asset == nil {
-		return fmt.Errorf("no asset selected")
-	}
-
-	log.Infof("id: %v", asset.GetID())
-	log.Infof("url: %v", asset.GetBrowserDownloadURL())
-	styles.PrintKV("Asset Name", asset.GetName())
-
-	rc, _, err := client.Repositories.DownloadReleaseAsset(
-		context.Background(), repo.Owner, repo.Name, asset.GetID(), http.DefaultClient,
-	)
 	if err != nil {
 		return err
 	}
@@ -189,7 +117,7 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 		binaryFilePath = tmpFile.Name()
 		log.Debugf("2 binaryFilePath: %v", binaryFilePath)
 		if destName == "" {
-			destName = asset.GetName()
+			destName = rcName
 		}
 	}
 	log.Infof("binaryFilePath: %v", binaryFilePath)
@@ -264,6 +192,110 @@ func runInstall(cmd *cobra.Command, args []string) error { // NOSONAR
 
 	styles.PrintKV("Installed", destName)
 	return nil
+}
+
+func processRepository(cmd *cobra.Command, args []string, preRelease bool, skipPrompts bool, assetName string) (io.ReadCloser, string, error) { // NOSONAR
+	if len(args) < 1 {
+		_ = cmd.Help()
+		return nil, "", fmt.Errorf("repository must be in format: owner/repo")
+	}
+
+	repo, err := parseRepository(args)
+	if err != nil {
+		log.Debugf("parseRepository err: %v", err)
+		_ = cmd.Help()
+		return nil, "", err
+	}
+	log.Info("Repository", "repo", repo)
+
+	log.Info("runtime", "GOOS", runtime.GOOS, "GOARCH", runtime.GOARCH)
+
+	tagDisplay := repo.Tag
+	if repo.Tag == "" {
+		if preRelease {
+			tagDisplay = "pre-release"
+		} else {
+			tagDisplay = "latest"
+		}
+	}
+	styles.PrintKV("Repository", fmt.Sprintf("%s/%s:%s", repo.Owner, repo.Name, tagDisplay))
+
+	client := getClient()
+
+	release, err := getRelease(client, repo, preRelease, skipPrompts)
+	if err != nil {
+		return nil, "", fmt.Errorf("get release error: %w", err)
+	}
+	if release == nil {
+		return nil, "", fmt.Errorf("no release found")
+	}
+	if verbose >= 3 {
+		log.Debugf("release: %v", release)
+	}
+
+	//styles.PrintKV("Version", fmt.Sprintf("%s (%s)", release.GetTagName(), release.GetName()))
+	renderReleaseTable(release)
+
+	// Asset
+	var asset *github.ReleaseAsset
+	var result int
+
+	if assetName != "" {
+		result = findAssetByName(release.Assets, assetName)
+	} else {
+		result = findAssetByPlatform(release.Assets, runtime.GOOS, runtime.GOARCH)
+	}
+	log.Debugf("result: %v", result)
+
+	if result < 0 || !skipPrompts {
+		options := make([]huh.Option[int], len(release.Assets))
+		for i, asset := range release.Assets {
+			options[i] = huh.NewOption(asset.GetName(), i)
+		}
+		form := huh.NewSelect[int]().
+			Title("Select a release asset:").
+			Options(options...).
+			Value(&result)
+
+		err = form.Run()
+		if err != nil {
+			return nil, "", fmt.Errorf("prompt failed: %w", err)
+		}
+	}
+
+	log.Debugf("result: %v", result)
+	asset = release.Assets[result]
+	log.Debugf("asset: %v", asset)
+
+	if asset == nil {
+		return nil, "", fmt.Errorf("no asset selected")
+	}
+
+	log.Infof("id: %v", asset.GetID())
+	log.Infof("url: %v", asset.GetBrowserDownloadURL())
+	styles.PrintKV("Asset Name", asset.GetName())
+
+	rc, _, err := client.Repositories.DownloadReleaseAsset(
+		context.Background(), repo.Owner, repo.Name, asset.GetID(), http.DefaultClient,
+	)
+	if err != nil {
+		return nil, "", err
+	}
+	return rc, asset.GetName(), nil
+}
+
+func downloadAssetURL(assetURL string) (io.ReadCloser, string, error) {
+	resp, err := http.DefaultClient.Get(assetURL)
+	if err != nil {
+		return nil, "", fmt.Errorf("%s for url: %s", err, assetURL)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		_ = resp.Body.Close()
+		return nil, "", fmt.Errorf("%d: %s for url: %s", resp.StatusCode, resp.Status, assetURL)
+	}
+	name := strings.TrimSuffix(path.Base(assetURL), path.Ext(assetURL))
+	return resp.Body, name, nil
 }
 
 func extractArchive(format archives.Format, stream io.Reader, tmpDir string) (string, error) { // NOSONAR
